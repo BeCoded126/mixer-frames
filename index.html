@@ -93,7 +93,6 @@ footer a{color:var(--mint-ink)}
     <div class="steps">
       <div class="step">
         <h2><span class="num">1</span>Your photo</h2>
-        <div class="field"><label for="code">Event code</label><input id="code" autocomplete="off" placeholder="From your confirmation email" maxlength="20"></div>
         <div class="drop" id="drop">
           <label class="btn dark" for="file">Choose photo</label>
           <input type="file" id="file" accept="image/jpeg,image/png,image/webp,image/heic">
@@ -153,15 +152,13 @@ footer a{color:var(--mint-ink)}
   };
   const $ = (id) => document.getElementById(id);
   const cv = $('cv'), ctx = cv.getContext('2d'), box = $('box');
-  const codeIn = $('code'), fileIn = $('file'), consent = $('consent'), makeBtn = $('makeBtn'), makeStatus = $('makeStatus');
+  const fileIn = $('file'), consent = $('consent'), makeBtn = $('makeBtn'), makeStatus = $('makeStatus');
   const useKid = $('useKid'), useNow = $('useNow'), zoomIn = $('zoom');
   const saveBtn = $('saveBtn'), saveStatus = $('saveStatus'), fallback = $('fallback'), fallbackImg = $('fallbackImg');
   const busy = $('busy');
   let overlay = null, original = null, kid = null, use = 'now', platform = 'instagram', offX = 0, offY = 0, upload = null;
 
-  const params = new URLSearchParams(location.search);
-  if (params.get('code')) codeIn.value = params.get('code').toUpperCase();
-  try { const c = localStorage.getItem('mixerCode'); if (!codeIn.value && c) codeIn.value = c; } catch (e) {}
+  const EVENT_CODE = 'MIXER1203';
 
   function loadImg(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
   const photo = () => (use === 'kid' && kid) ? kid : original;
@@ -222,12 +219,12 @@ footer a{color:var(--mint-ink)}
     $('hint').hidden = !!P.story;
   }
   function refreshButtons() {
-    const ready = !!original && consent.checked && codeIn.value.trim().length > 3;
+    const ready = !!original && consent.checked;
     makeBtn.disabled = !ready || busy.hidden === false;
     useKid.disabled = !kid; useNow.disabled = !original;
     useKid.setAttribute('aria-pressed', use === 'kid'); useNow.setAttribute('aria-pressed', use === 'now');
     saveBtn.disabled = !original;
-    if (original && !kid && makeStatus.textContent === 'Add your photo to start.') makeStatus.textContent = (!consent.checked ? 'Tick the photo note to continue.' : (codeIn.value.trim().length > 3 ? 'Ready when you are.' : 'Enter the event code from your confirmation email.'));
+    
   }
   function setStatus(el, msg, err) { el.textContent = msg; el.classList.toggle('err', !!err); }
 
@@ -241,7 +238,7 @@ footer a{color:var(--mint-ink)}
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
     upload = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9));
     $('fileName').textContent = f.name || 'Photo added';
-    setStatus(makeStatus, consent.checked ? (codeIn.value.trim().length > 3 ? 'Ready when you are.' : 'Enter the event code from your confirmation email.') : 'Tick the photo note to continue.');
+    setStatus(makeStatus, consent.checked ? 'Ready when you are.' : 'Tick the photo note to continue.');
     fallback.hidden = true; refreshButtons(); render();
   }
   fileIn.addEventListener('change', e => takeFile(e.target.files[0]));
@@ -250,11 +247,10 @@ footer a{color:var(--mint-ink)}
   ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', e => takeFile(e.dataTransfer.files[0]));
   consent.addEventListener('change', () => { if (original && !kid) setStatus(makeStatus, consent.checked ? 'Ready when you are.' : 'Tick the photo note to continue.'); refreshButtons(); });
-  codeIn.addEventListener('input', refreshButtons);
 
   makeBtn.addEventListener('click', async () => {
     if (!upload) return;
-    const code = codeIn.value.trim().toUpperCase();
+    const code = EVENT_CODE;
     busy.hidden = false; makeBtn.disabled = true; setStatus(makeStatus, 'Working on it…');
     const fd = new FormData(); fd.append('image', upload, 'photo.jpg'); fd.append('code', code); fd.append('consent', 'yes');
     try {
@@ -262,7 +258,6 @@ footer a{color:var(--mint-ink)}
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.image) throw new Error(data.message || 'Something went wrong. Try again.');
       kid = await loadImg(data.image); use = 'kid'; offX = offY = 0; zoomIn.value = 100;
-      try { localStorage.setItem('mixerCode', code); } catch (e) {}
       setStatus(makeStatus, 'Done. Here’s you at 10.');
     } catch (e) { setStatus(makeStatus, e.message || 'Something went wrong. Try again.', true); }
     busy.hidden = true; refreshButtons(); render();

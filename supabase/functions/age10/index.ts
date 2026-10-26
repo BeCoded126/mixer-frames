@@ -8,6 +8,7 @@ const MODEL = Deno.env.get("OPENAI_IMAGE_MODEL") ?? "gpt-image-1.5";
 const QUALITY = Deno.env.get("OPENAI_IMAGE_QUALITY") ?? "high";
 const MAX_BYTES = 8 * 1024 * 1024;
 const PER_IP_PER_HOUR = 6;
+const DAY_CAP = Number(Deno.env.get("AGE10_DAY_CAP") ?? "300");
 
 const PROMPT =
   "Using the photo provided, create a realistic portrait of this same person at about 10 years old. " +
@@ -22,12 +23,21 @@ const cors = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const hits = new Map<string, number[]>();
-function limited(ip: string): boolean {
-  const now = Date.now();
-  const list = (hits.get(ip) ?? []).filter((t) => now - t < 3600_000);
-  if (list.length >= PER_IP_PER_HOUR) { hits.set(ip, list); return true; }
-  list.push(now); hits.set(ip, list); return false;
+async function sha256(text: string) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+// Atomic usage check in Postgres: caps total images per 24 hours and per IP per hour.
+async function claimSlot(ip: string): Promise<string> {
+  const url = Deno.env.get("SUPABASE_URL"), key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return "ok";
+  const res = await fetch(`${url}/rest/v1/rpc/claim_age10_slot`, {
+    method: "POST",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ p_ip_hash: await sha256("mixer:" + ip), p_day_cap: DAY_CAP, p_ip_hour_cap: PER_IP_PER_HOUR }),
+  });
+  if (!res.ok) { console.error("claim failed", res.status, await res.text()); return "ok"; }
+  return String(await res.json());
 }
 
 function reply(status: number, body: Record<string, unknown>) {
@@ -61,7 +71,7 @@ Deno.serve(async (req) => {
   try { form = await req.formData(); } catch { return reply(400, { error: "bad_request", message: "Send the photo as a file upload." }); }
 
   const code = String(form.get("code") ?? "").trim().toUpperCase();
-  if (code !== EVENT_CODE) return reply(403, { error: "bad_code", message: "That event code doesn't match. It's in your registration confirmation email." });
+  if (code !== EVENT_CODE) return reply(403, { error: "bad_code", message: "Please reload the page and try again." });
   if (String(form.get("consent") ?? "") !== "yes") return reply(400, { error: "consent", message: "Please agree to the photo note first." });
 
   const image = form.get("image");
@@ -70,7 +80,9 @@ Deno.serve(async (req) => {
   if (image.size > MAX_BYTES) return reply(413, { error: "size", message: "That photo is too large. Try one under 8 MB." });
 
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
-  if (limited(ip)) return reply(429, { error: "rate_limited", message: "You've made a few already. Try again in an hour." });
+  const slot = await claimSlot(ip);
+  if (slot === "ip_cap") return reply(429, { error: "rate_limited", message: "You've made a few already. Try again in an hour." });
+  if (slot === "day_cap") return reply(429, { error: "day_cap", message: "We've hit today's limit for age-10 photos. Try again tomorrow, or use your photo as is." });
 
   try {
     let res = await callOpenAI(key, image, true);
