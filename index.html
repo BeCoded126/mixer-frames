@@ -100,7 +100,20 @@ footer a{color:var(--mint-ink)}
 
     <div class="steps">
       <div class="step">
-        <h2><span class="num">1</span>Your photo</h2>
+        <h2><span class="num">1</span>Where are you posting?</h2>
+        <div class="seg" role="group" aria-label="Platform">
+          <button type="button" data-p="instagram" aria-pressed="true"><b>Instagram</b><span>Profile · 1080</span></button>
+          <button type="button" data-p="linkedin" aria-pressed="false"><b>LinkedIn</b><span>Profile · 800</span></button>
+          <button type="button" data-p="facebook" aria-pressed="false"><b>Facebook</b><span>Profile · 960</span></button>
+          <button type="button" data-p="x" aria-pressed="false"><b>X</b><span>Profile · 800</span></button>
+          <button type="button" data-p="story" aria-pressed="false"><b>Story</b><span>IG / FB · 1080×1920</span></button>
+          <button type="button" data-p="hd" aria-pressed="false"><b>Anything else</b><span>Square · 2048</span></button>
+        </div>
+        <p class="tip" id="tip">Instagram shows profile pictures as a circle, and the frame is already round.</p>
+      </div>
+
+      <div class="step">
+        <h2><span class="num">2</span>Your photo</h2>
         <div class="drop" id="drop">
           <label class="btn dark" for="file">Choose photo</label>
           <input type="file" id="file" accept="image/jpeg,image/png,image/webp,image/heic">
@@ -114,25 +127,12 @@ footer a{color:var(--mint-ink)}
       </div>
 
       <div class="step">
-        <h2><span class="num">2</span>Pick your version</h2>
+        <h2><span class="num">3</span>Pick your version and save</h2>
         <div class="toggle" role="group" aria-label="Photo version">
           <button type="button" id="useKid" aria-pressed="false" disabled><b>Me at 10</b><span>The AI version</span></button>
           <button type="button" id="useNow" aria-pressed="true" disabled><b>Me today</b><span>Your original photo</span></button>
         </div>
         <div class="zoomrow"><label for="zoom">Zoom</label><input type="range" id="zoom" min="100" max="300" value="100"><button type="button" class="btn ghost" id="reset" style="padding:8px 12px;min-height:36px;font-size:12px">Reset</button></div>
-      </div>
-
-      <div class="step">
-        <h2><span class="num">3</span>Where are you posting?</h2>
-        <div class="seg" role="group" aria-label="Platform">
-          <button type="button" data-p="instagram" aria-pressed="true"><b>Instagram</b><span>Profile · 1080</span></button>
-          <button type="button" data-p="linkedin" aria-pressed="false"><b>LinkedIn</b><span>Profile · 800</span></button>
-          <button type="button" data-p="facebook" aria-pressed="false"><b>Facebook</b><span>Profile · 960</span></button>
-          <button type="button" data-p="x" aria-pressed="false"><b>X</b><span>Profile · 800</span></button>
-          <button type="button" data-p="story" aria-pressed="false"><b>Story</b><span>IG / FB · 1080×1920</span></button>
-          <button type="button" data-p="hd" aria-pressed="false"><b>Anything else</b><span>Square · 2048</span></button>
-        </div>
-        <p class="tip" id="tip">Instagram shows profile pictures as a circle, and the frame is already round.</p>
         <div class="row">
           <button type="button" class="btn" id="saveBtn" disabled>Download</button>
           <span class="status" id="saveStatus" aria-live="polite"></span>
