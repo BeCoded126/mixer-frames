@@ -52,8 +52,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-family:var(--label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:13px}
 .field input{font:600 16px var(--body);padding:11px 12px;border:2px solid var(--line);border-radius:10px;color:var(--ink);background:#fff;text-transform:uppercase;letter-spacing:.08em}
-.consent{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted)}
-.consent input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:var(--mint-ink)}
+.disclaimer{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -98,9 +97,9 @@ footer a{color:var(--mint-ink)}
           <input type="file" id="file" accept="image/jpeg,image/png,image/webp,image/heic">
           <span id="fileName">A clear, front-facing photo of just you works best.</span>
         </div>
-        <label class="consent"><input type="checkbox" id="consent"><span>I’m OK with my photo being sent to OpenAI to create the age-10 version. FLBHC doesn’t keep your photo.</span></label>
+        <p class="disclaimer">Your photo will be edited with AI to create the youth version to include in promotion. FLBHC does not keep your photo.</p>
         <div class="row">
-          <button type="button" class="btn" id="makeBtn" disabled>Make me 10</button>
+          <button type="button" class="btn" id="makeBtn" disabled>Make me a kid again!</button>
           <span class="status" id="makeStatus" aria-live="polite">Add your photo to start.</span>
         </div>
       </div>
@@ -152,7 +151,7 @@ footer a{color:var(--mint-ink)}
   };
   const $ = (id) => document.getElementById(id);
   const cv = $('cv'), ctx = cv.getContext('2d'), box = $('box');
-  const fileIn = $('file'), consent = $('consent'), makeBtn = $('makeBtn'), makeStatus = $('makeStatus');
+  const fileIn = $('file'), makeBtn = $('makeBtn'), makeStatus = $('makeStatus');
   const useKid = $('useKid'), useNow = $('useNow'), zoomIn = $('zoom');
   const saveBtn = $('saveBtn'), saveStatus = $('saveStatus'), fallback = $('fallback'), fallbackImg = $('fallbackImg');
   const busy = $('busy');
@@ -219,7 +218,7 @@ footer a{color:var(--mint-ink)}
     $('hint').hidden = !!P.story;
   }
   function refreshButtons() {
-    const ready = !!original && consent.checked;
+    const ready = !!original;
     makeBtn.disabled = !ready || busy.hidden === false;
     useKid.disabled = !kid; useNow.disabled = !original;
     useKid.setAttribute('aria-pressed', use === 'kid'); useNow.setAttribute('aria-pressed', use === 'now');
@@ -238,7 +237,7 @@ footer a{color:var(--mint-ink)}
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
     upload = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9));
     $('fileName').textContent = f.name || 'Photo added';
-    setStatus(makeStatus, consent.checked ? 'Ready when you are.' : 'Tick the photo note to continue.');
+    setStatus(makeStatus, 'Ready when you are.');
     fallback.hidden = true; refreshButtons(); render();
   }
   fileIn.addEventListener('change', e => takeFile(e.target.files[0]));
@@ -246,7 +245,6 @@ footer a{color:var(--mint-ink)}
   ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
   ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', e => takeFile(e.dataTransfer.files[0]));
-  consent.addEventListener('change', () => { if (original && !kid) setStatus(makeStatus, consent.checked ? 'Ready when you are.' : 'Tick the photo note to continue.'); refreshButtons(); });
 
   makeBtn.addEventListener('click', async () => {
     if (!upload) return;
