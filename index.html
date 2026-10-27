@@ -159,6 +159,18 @@ footer a{color:var(--mint-ink)}
     hd: { size: 2048, tip: 'A large square that works for Teams, Slack, Gmail and anywhere else.' },
   };
   const $ = (id) => document.getElementById(id);
+  // anonymous usage counts (no photos, names or emails are sent)
+  const TRACK = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/track';
+  const qs = new URLSearchParams(location.search);
+  const SOURCE = qs.get('src') || qs.get('utm_source') || (document.referrer ? (() => { try { return new URL(document.referrer).hostname; } catch (e) { return 'other'; } })() : 'direct');
+  let VISITOR = '';
+  try { VISITOR = localStorage.getItem('mixerVisitor') || ''; if (!VISITOR) { VISITOR = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('mixerVisitor', VISITOR); } } catch (e) {}
+  function track(event, extra) {
+    try {
+      const body = JSON.stringify(Object.assign({ event, source: SOURCE, visitor: VISITOR, referrer: document.referrer ? document.referrer.slice(0, 80) : '' }, extra || {}));
+      if (!(navigator.sendBeacon && navigator.sendBeacon(TRACK, new Blob([body], { type: 'text/plain' })))) fetch(TRACK, { method: 'POST', body, keepalive: true, headers: { 'Content-Type': 'text/plain' } }).catch(() => {});
+    } catch (e) {}
+  }
   const cv = $('cv'), ctx = cv.getContext('2d'), box = $('box');
   const fileIn = $('file'), makeBtn = $('makeBtn'), makeStatus = $('makeStatus');
   const useKid = $('useKid'), useNow = $('useNow'), zoomIn = $('zoom');
@@ -248,6 +260,7 @@ footer a{color:var(--mint-ink)}
     $('fileName').textContent = f.name || 'Photo added';
     setStatus(makeStatus, 'Ready when you are.');
     fallback.hidden = true; refreshButtons(); render();
+    track('photo_added');
   }
   fileIn.addEventListener('change', e => takeFile(e.target.files[0]));
   const drop = $('drop');
@@ -266,7 +279,8 @@ footer a{color:var(--mint-ink)}
       if (!res.ok || !data.image) throw new Error(data.message || 'Something went wrong. Try again.');
       kid = await loadImg(data.image); use = 'kid'; offX = offY = 0; zoomIn.value = 100;
       setStatus(makeStatus, 'Done. Here’s you at 10.');
-    } catch (e) { setStatus(makeStatus, e.message || 'Something went wrong. Try again.', true); }
+      track('kid_made');
+    } catch (e) { setStatus(makeStatus, e.message || 'Something went wrong. Try again.', true); track('kid_failed'); }
     busy.hidden = true; refreshButtons(); render();
   });
   useKid.addEventListener('click', () => { use = 'kid'; offX = offY = 0; zoomIn.value = 100; refreshButtons(); render(); });
@@ -291,6 +305,7 @@ footer a{color:var(--mint-ink)}
     else { out = document.createElement('canvas'); out.width = out.height = P.size; const g = out.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(framedCanvas(), 0, 0, P.size, P.size); }
     const blob = await new Promise(r => out.toBlob(r, 'image/png'));
     const name = `mixer-attending-${platform}${use === 'kid' ? '-age10' : ''}.png`;
+    track('download', { platform, version: use === 'kid' ? 'age10' : 'today' });
     const file = new File([blob], name, { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
       try { await navigator.share({ files: [file], title: 'My mixer profile picture' }); saveStatus.textContent = 'Saved. Now set it as your profile picture.'; return; } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -301,6 +316,7 @@ footer a{color:var(--mint-ink)}
     saveStatus.textContent = 'Downloaded. If nothing saved, use the image below.';
   });
 
+  track('view');
   loadImg('attend-frame.png').then(i => { overlay = i; render(); });
   render();
   if (document.fonts) { document.fonts.load('58px "Permanent Marker"').then(render).catch(() => {}); document.fonts.ready.then(render); }
