@@ -164,6 +164,9 @@ footer a{color:var(--mint-ink)}
   const MINT = '#35D9B4', INK = '#0E1A30';
   const ROLES = { speaking: "I'M SPEAKING AT THE ", moderating: "I'M MODERATING THE ", sponsoring: "I'M SPONSORING THE ", partner: 'PROUD PARTNER OF THE ', hosting: "I'M HOSTING THE ", attending: "I'M ATTENDING THE " };
   let role = 'speaking';
+  const RCOL = { speaking: '#E8279A', moderating: '#7B3FD6', sponsoring: '#F5C02E', partner: '#3FA9F5', hosting: '#FFFFFF', attending: MINT };
+  const RFILE = r => r === 'attending' ? '../attend-frame.png' : `../frame-${r}.png`;
+  const overlays = {};
   const PLAT = {
     instagram: { size: 1080, tip: 'Instagram shows profile pictures as a circle, and the frame is already round.' },
     linkedin: { size: 800, tip: 'LinkedIn crops to a circle. Upload it from your profile photo, then skip the crop.' },
@@ -198,7 +201,7 @@ footer a{color:var(--mint-ink)}
   const photo = () => (use === 'kid' && kid) ? kid : original;
 
   function arcText(g) {
-    const parts = [[ROLES[role], '#FFFFFF'], ['C.A.A.M', MINT]];
+    const parts = [[ROLES[role], '#FFFFFF'], ['C.A.A.M', RCOL[role]]];
     const chars = []; parts.forEach(([t, col]) => { for (const ch of t) chars.push([ch, col]); });
     const maxLen = RT * ((A1 - A0) * Math.PI / 180) * 0.94;
     let fs = FS, widths, total;
@@ -303,7 +306,7 @@ footer a{color:var(--mint-ink)}
   $('reset').addEventListener('click', () => { zoomIn.value = 100; offX = offY = 0; render(); });
 
   document.querySelectorAll('[data-r]').forEach(b => b.addEventListener('click', () => {
-    role = b.dataset.r; document.querySelectorAll('[data-r]').forEach(x => x.setAttribute('aria-pressed', x === b)); render();
+    role = b.dataset.r; document.querySelectorAll('[data-r]').forEach(x => x.setAttribute('aria-pressed', x === b)); setRole();
   }));
   document.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => {
     platform = b.dataset.p; document.querySelectorAll('[data-p]').forEach(x => x.setAttribute('aria-pressed', x === b));
@@ -334,7 +337,9 @@ footer a{color:var(--mint-ink)}
   });
 
   track('view');
-  loadImg('../attend-frame.png').then(i => { overlay = i; render(); });
+  function setRole() { if (overlays[role]) { overlay = overlays[role]; render(); return; } const r = role; loadImg(RFILE(r)).then(i => { overlays[r] = i; if (role === r) { overlay = i; render(); } }); }
+  setRole();
+  Object.keys(RCOL).forEach(r => loadImg(RFILE(r)).then(i => { overlays[r] = i; }));
   render();
   if (document.fonts) { document.fonts.load('58px "Permanent Marker"').then(render).catch(() => {}); document.fonts.ready.then(render); }
   refreshButtons();
