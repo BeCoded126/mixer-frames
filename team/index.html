@@ -106,7 +106,7 @@ footer a{color:var(--mint-ink)}
         <div class="seg" role="group" aria-label="Role">
           <button type="button" data-r="speaking" aria-pressed="true"><b>Panelist</b><span>I’m speaking at</span></button>
           <button type="button" data-r="moderating" aria-pressed="false"><b>Moderator</b><span>I’m moderating</span></button>
-          <button type="button" data-r="sponsoring" aria-pressed="false"><b>Sponsor</b><span>I’m sponsoring</span></button>
+          <button type="button" data-r="sponsoring" aria-pressed="false"><b>Sponsor</b><span id="spLine">I’m sponsoring</span></button>
           <button type="button" data-r="partner" aria-pressed="false"><b>Partner</b><span>Proud partner of</span></button>
           <button type="button" data-r="hosting" aria-pressed="false"><b>Host team</b><span>I’m hosting</span></button>
           <button type="button" data-r="attending" aria-pressed="false"><b>Attending</b><span>I’m attending</span></button>
@@ -116,7 +116,7 @@ footer a{color:var(--mint-ink)}
           <div class="drop" id="logoDrop">
             <label class="btn dark" for="logoFile">Add logo</label>
             <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
-            <span id="logoName">Your logo goes on the Story version. A PNG with a transparent or white background looks best.</span>
+            <span id="logoName">Your logo goes on the Story version. We clear its background for you.</span>
           </div>
         </div>
       </div>
@@ -177,7 +177,7 @@ footer a{color:var(--mint-ink)}
   const RCOL = { speaking: '#E8279A', moderating: '#7B3FD6', sponsoring: '#F5C02E', partner: '#3FA9F5', hosting: '#FFFFFF', attending: MINT };
   const RFILE = r => r === 'attending' ? '../attend-frame.png' : `../frame-${r}.png`;
   const overlays = {};
-  let org = '', logo = null;
+  let org = '', logo = null, logoLight = false;
   const sponsorLogo = () => role === 'sponsoring' && !!logo;
   const PLAT = {
     instagram: { size: 1080, tip: 'Instagram shows profile pictures as a circle, and the frame is already round.' },
@@ -260,7 +260,7 @@ footer a{color:var(--mint-ink)}
     if (sponsorLogo()) {
       g.drawImage(framedCanvas(), 150, 540, 780, 780);
       const cw = 640, ch = 190, cx = (W - cw) / 2, cy = 1360;
-      g.save(); g.shadowColor = 'rgba(14,26,48,.18)'; g.shadowBlur = 24; g.shadowOffsetY = 6; g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(cx, cy, cw, ch, 24); g.fill(); g.restore();
+      g.save(); g.shadowColor = 'rgba(14,26,48,.18)'; g.shadowBlur = 24; g.shadowOffsetY = 6; g.fillStyle = logoLight ? INK : '#FFFFFF'; g.beginPath(); g.roundRect(cx, cy, cw, ch, 24); g.fill(); g.restore();
       g.fillStyle = RCOL.sponsoring; g.beginPath(); g.roundRect(cx, cy, 14, ch, [24, 0, 0, 24]); g.fill();
       fitLogo(g, W / 2 + 7, cy + ch / 2, cw - 110, ch - 50);
     } else g.drawImage(framedCanvas(), 70, 560, 940, 940);
@@ -333,7 +333,37 @@ footer a{color:var(--mint-ink)}
     $('tip').textContent = PLAT[platform].tip; fallback.hidden = true; saveStatus.textContent = ''; render();
   }));
 
-  $('org').addEventListener('input', e => { org = e.target.value; render(); });
+  $('org').addEventListener('input', e => { org = e.target.value; $('spLine').textContent = org.trim() ? org.trim() + ' is sponsoring' : 'I’m sponsoring'; render(); });
+  // clear a solid background: flood fill from the border through pixels close to the dominant border colour
+  function clearBg(img) {
+    const c = document.createElement('canvas'); c.width = img.naturalWidth || img.width; c.height = img.naturalHeight || img.height;
+    const k = Math.min(1, 1600 / Math.max(c.width, c.height)); c.width = Math.round(c.width * k); c.height = Math.round(c.height * k);
+    const g = c.getContext('2d'); g.drawImage(img, 0, 0, c.width, c.height);
+    const W = c.width, H = c.height, im = g.getImageData(0, 0, W, H), d = im.data;
+    const border = []; for (let x = 0; x < W; x++) border.push(x, (H - 1) * W + x); for (let y = 0; y < H; y++) border.push(y * W, y * W + W - 1);
+    const counts = {}; let opaque = 0;
+    border.forEach(i => { const j = i * 4; if (d[j + 3] < 200) return; opaque++; const key = (d[j] >> 4) + ',' + (d[j + 1] >> 4) + ',' + (d[j + 2] >> 4); counts[key] = (counts[key] || 0) + 1; });
+    if (opaque < border.length * 0.6) return c;            // already transparent
+    const [key, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    if (n < opaque * 0.5) return c;                          // busy edges: probably a photo, leave it
+    let br = 0, bg = 0, bb = 0, m = 0;
+    border.forEach(i => { const j = i * 4; if (d[j + 3] < 200) return; const kk = (d[j] >> 4) + ',' + (d[j + 1] >> 4) + ',' + (d[j + 2] >> 4); if (kk === key) { br += d[j]; bg += d[j + 1]; bb += d[j + 2]; m++; } });
+    br /= m; bg /= m; bb /= m;
+    const dist = j => Math.hypot(d[j] - br, d[j + 1] - bg, d[j + 2] - bb);
+    const T = 48, SOFT = 90, N = W * H, e = new Float32Array(N);
+    for (let i = 0; i < N; i++) { e[i] = dist(i * 4); if (e[i] < T) d[i * 4 + 3] = 0; }
+    for (let i = 0; i < N; i++) {            // soften the anti-aliased rim next to cleared pixels
+      if (e[i] < T || e[i] >= SOFT) continue; const x = i % W;
+      if ((x > 0 && e[i - 1] < T) || (x < W - 1 && e[i + 1] < T) || (i >= W && e[i - W] < T) || (i < N - W && e[i + W] < T)) { const t = Math.max(0.15, (e[i] - T) / (SOFT - T)), j = i * 4; d[j] = Math.min(255, Math.max(0, (d[j] - (1 - t) * br) / t)); d[j + 1] = Math.min(255, Math.max(0, (d[j + 1] - (1 - t) * bg) / t)); d[j + 2] = Math.min(255, Math.max(0, (d[j + 2] - (1 - t) * bb) / t)); d[j + 3] = Math.round(d[j + 3] * t); }
+    }
+    g.putImageData(im, 0, 0); return c;
+  }
+  // true when what's left of the logo is mostly white/light, so it needs a dark card
+  function isLight(c) {
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let sum = 0, n = 0;
+    for (let j = 0; j < d.length; j += 16) { if (d[j + 3] < 128) continue; sum += 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2]; n++; }
+    return n > 0 && sum / n > 205;
+  }
   // crop blank (white or transparent) margins off an uploaded logo
   function trim(img) {
     const c = document.createElement('canvas'); c.width = img.naturalWidth || img.width; c.height = img.naturalHeight || img.height;
@@ -347,7 +377,7 @@ footer a{color:var(--mint-ink)}
   }
   async function takeLogo(f) {
     if (!f || !/^image\/(png|jpeg|webp)$/.test(f.type)) { $('logoName').textContent = 'Use a PNG, JPG or WebP logo.'; return; }
-    try { logo = trim(await loadImg(URL.createObjectURL(f))); } catch (e) { $('logoName').textContent = 'That logo couldn’t be opened. Try a PNG.'; return; }
+    try { logo = trim(clearBg(await loadImg(URL.createObjectURL(f)))); logoLight = isLight(logo); } catch (e) { $('logoName').textContent = 'That logo couldn’t be opened. Try a PNG.'; return; }
     $('logoName').textContent = f.name || 'Logo added'; refreshButtons(); render();
   }
   $('logoFile').addEventListener('change', e => takeLogo(e.target.files[0]));
