@@ -25,7 +25,7 @@
 [hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
-.wrap{max-width:1040px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:24px}
+.wrap{max-width:1440px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:24px}
 header{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
 .kicker{font-family:var(--label);font-weight:600;letter-spacing:.3em;font-size:13px;text-transform:uppercase}
 .patch{background:var(--ink);color:#fff;font-family:var(--display);font-size:clamp(42px,9vw,72px);line-height:1;padding:14px 28px 18px;text-align:center;transform:rotate(-1.5deg);clip-path:polygon(1% 4%,30% 0,62% 3%,99% 0,100% 46%,98% 100%,66% 97%,33% 100%,0 97%,2% 52%)}
@@ -109,6 +109,37 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 .mineform{display:flex;flex-direction:column;gap:12px;min-width:0}
 .mineform .field input{text-transform:none;letter-spacing:0}
 .mineBtns{display:flex;flex-wrap:wrap;gap:8px}
+
+/* ---------- layout: two panes on desktop, tabs on phones and tablets ---------- */
+.patch{align-self:flex-start}
+.panetitle{display:none;margin:0;align-items:center;gap:10px;font-family:var(--label);font-weight:700;font-size:18px;letter-spacing:.14em;text-transform:uppercase}
+.panetitle span,.tabs span{width:26px;height:26px;border-radius:50%;background:var(--mag);color:#fff;display:inline-grid;place-items:center;font-size:13px;letter-spacing:0;flex:none}
+.tabs{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;margin:0 -8px;background:rgba(237,238,240,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:0 0 16px 16px}
+.tabs button{appearance:none;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;min-height:48px;padding:8px 10px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--label);font-weight:700;font-size:15px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tabs button:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+.panes{display:flex;flex-direction:column;gap:24px;min-width:0}
+.panes>section{min-width:0}
+.panes[data-show="frame"] .kit,.panes[data-show="kit"] .studio{display:none}
+.tabnext{align-self:flex-start}
+@media (min-width:1100px){
+  header{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:36px;row-gap:8px;align-items:center}
+  header .kicker{grid-column:1 / -1}
+  header .patch{grid-row:2 / span 2}
+  header p{margin:0}
+  .tabs,.tabnext{display:none}
+  .panes{display:grid;grid-template-columns:minmax(380px,480px) minmax(0,1fr);gap:28px;align-items:start}
+  .panes[data-show] .kit,.panes[data-show] .studio{display:flex}
+  .panes .studio{display:flex;flex-direction:column;gap:16px}
+  .panetitle{display:flex}
+  .studio .canvas-box{max-width:400px}
+  .kithead{padding:20px 22px}
+  .cards{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .copies{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:1100px) and (max-width:1279px){.mine{grid-template-columns:minmax(0,1fr)}.mineprev{max-width:300px}}
+@media (max-width:480px){.tabs button{font-size:14px;letter-spacing:.05em;gap:6px;padding:8px 6px;white-space:nowrap}.tabs span{width:22px;height:22px;font-size:12px}}
+@media (max-width:640px){.mineprev{max-width:320px;margin:0 auto;width:100%}.kithead{padding:20px 18px 22px}.step{padding:16px}}
 footer{font-size:13px;color:var(--muted)}
 footer a{color:var(--mint-ink)}
 </style>
@@ -119,10 +150,17 @@ footer a{color:var(--mint-ink)}
     <div class="kicker">Dec 3 · Fort Lauderdale Behavioral Health Center</div>
     <div class="patch" role="img" aria-label="Bi-Annual Child and Adolescent Mixer"><small>BI-ANNUAL</small><span class="ca">Child &amp; Adolescent</span>MIXER<i class="u"></i></div>
     <p>For our panelists, moderators, sponsors, partners and hosts. Make your profile frame below, then grab the flyers, posts and ready-to-send invites to bring your team.</p>
-    <div class="ctarow"><a class="btn mag" data-rsvp href="https://lp.constantcontactpages.com/ev/reg/5xmw7m4" target="_blank" rel="noopener">RSVP for Dec 3</a><a class="btn ghost" href="#kit">Get the share kit ↓</a></div>
+    <div class="ctarow"><a class="btn mag" data-rsvp href="https://lp.constantcontactpages.com/ev/reg/5xmw7m4" target="_blank" rel="noopener">RSVP for Dec 3</a><a class="btn ghost" href="#kit" data-goto="kit">Get the partner kit</a></div>
   </header>
 
-  <section class="studio">
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-tab="frame" aria-selected="true"><span>1</span>Profile picture</button>
+    <button type="button" role="tab" data-tab="kit" aria-selected="false"><span>2</span>Partner kit</button>
+  </nav>
+
+  <div class="panes" id="panes" data-show="frame">
+  <section class="studio" id="frame">
+    <h2 class="panetitle"><span>1</span>Your profile picture</h2>
     <div class="stage">
       <div class="canvas-box" id="box"><canvas id="cv" width="1080" height="1080" aria-label="Preview of your framed profile picture"></canvas></div>
       <div class="hint" id="hint">Drag the photo to line it up. Keep your face above the logo patch.</div>
@@ -188,12 +226,14 @@ footer a{color:var(--mint-ink)}
           <button type="button" class="btn" id="saveBtn" disabled>Download</button>
           <span class="status" id="saveStatus" aria-live="polite"></span>
         </div>
+        <button type="button" class="btn ghost tabnext" data-goto="kit">Next: your partner kit →</button>
         <div class="fallback" id="fallback" hidden><img id="fallbackImg" alt="Your framed profile picture"><span class="status">Press and hold the image, then choose Save to Photos.</span></div>
       </div>
     </div>
   </section>
 
   <section class="kit" id="kit">
+    <h2 class="panetitle"><span>2</span>Your partner kit</h2>
     <div class="kithead">
       <h2>Bring your team</h2>
       <p>Flyers, posts and ready-to-send invites for your staff and network. Everything points to the RSVP page, and it’s free to attend.</p>
@@ -203,7 +243,7 @@ footer a{color:var(--mint-ink)}
     <div class="mine">
       <div class="mineprev"><canvas id="pv" width="1080" height="1350" aria-label="Preview of your personalized post"></canvas></div>
       <div class="mineform">
-        <p class="tip" id="mineTip">Built from your role and photo at the top of the page. Add your name so people know who’s inviting them.</p>
+        <p class="tip" id="mineTip">Built from your role and photo in step 1. Add your name so people know who’s inviting them.</p>
         <div class="field"><label for="pname">Your name</label><input id="pname" maxlength="40" autocomplete="name" placeholder="Stephanie Breedlove, MBA"></div>
         <div class="field"><label for="ptitle">Title and organization</label><input id="ptitle" maxlength="70" placeholder="Clinical Outreach, Discovery Behavioral Health"></div>
         <div class="mineBtns">
@@ -215,7 +255,7 @@ footer a{color:var(--mint-ink)}
       </div>
     </div>
     <h3>Event flyers to share</h3>
-    <div class="cards"><div class="card"><div class="thumb"><img src="../kit/t-post.jpg" alt="Feed post preview" loading="lazy"></div><b>Feed post</b><span>Instagram, LinkedIn, Facebook · 1080×1350</span><a class="btn dark" href="../kit/mixer-feed-post-1080x1350.png" download data-kit="post">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-story.jpg" alt="Story preview" loading="lazy"></div><b>Story</b><span>Instagram or Facebook Story · 1080×1920. Add a link sticker to the RSVP page.</span><a class="btn dark" href="../kit/mixer-story-1080x1920.png" download data-kit="story">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-banner.jpg" alt="Email signature banner preview" loading="lazy"></div><b>Email signature banner</b><span>Outlook or Gmail · display at 600×150</span><a class="btn dark" href="../kit/mixer-email-banner-1200x300.png" download data-kit="banner">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-flyer.jpg" alt="Flyer, high resolution preview" loading="lazy"></div><b>Flyer, high resolution</b><span>For intranets, newsletters and screens · 2160×2700</span><a class="btn dark" href="../kit/mixer-flyer-2160x2700.png" download data-kit="flyer">Download</a></div></div>
+    <div class="cards"><div class="card"><div class="thumb"><img src="../kit/t-post.jpg" alt="Feed post preview" loading="lazy"></div><b>Feed post</b><span>Instagram, LinkedIn, Facebook · 1080×1350</span><a class="btn dark" href="../kit/mixer-feed-post-1080x1350.png" download data-kit="post">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-story.jpg" alt="Story preview" loading="lazy"></div><b>Story</b><span>Instagram or Facebook Story · 1080×1920. Add a link sticker to the RSVP page.</span><a class="btn dark" href="../kit/mixer-story-1080x1920.png" download data-kit="story">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-banner.jpg" alt="Email signature banner preview" loading="lazy"></div><b>Email signature banner</b><span>Outlook or Gmail · display at 600×150</span><a class="btn dark" href="../kit/mixer-email-banner-1200x300.png" download data-kit="banner">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-flyer.jpg" alt="Flyer, high resolution preview" loading="lazy"></div><b>Flyer, high resolution</b><span>For intranets, newsletters and screens · 1290×1916</span><a class="btn dark" href="../kit/mixer-flyer-1290x1916.png" download data-kit="flyer">Download</a></div></div>
     <h3>Event flyers to print</h3>
     <div class="cards"><div class="card"><div class="thumb"><img src="../kit/t-letter.jpg" alt="Flyer, letter size preview" loading="lazy"></div><b>Flyer, letter size</b><span>8.5×11 PDF with an RSVP QR code. Break rooms, front desks, team meetings.</span><a class="btn dark" href="../kit/mixer-flyer-letter.pdf" download data-kit="letter">Download PDF</a></div><div class="card"><div class="thumb"><img src="../kit/t-poster.jpg" alt="Poster, 11×17 preview" loading="lazy"></div><b>Poster, 11×17</b><span>Tabloid PDF with an RSVP QR code for bulletin boards and lobbies.</span><a class="btn dark" href="../kit/mixer-poster-11x17.pdf" download data-kit="poster">Download PDF</a></div></div>
     <h3>Copy and paste</h3>
@@ -247,6 +287,7 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
 RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
 <div class="row"><button type="button" class="btn" data-copy="social">Copy</button><span class="status" aria-live="polite"></span></div></div></div>
   </section>
+  </div>
 
   <footer>Bi-Annual Child &amp; Adolescent Mixer · Thursday, December 3 · 10 AM–12 PM · FLBHC Auditorium, 951 NE 56th Street, Oakland Park, FL 33334. Hosted by Fort Lauderdale Behavioral Health Center with Discovery Behavioral Health.</footer>
 </div>
@@ -610,6 +651,18 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
     set('newsletter', `Bi-Annual Child & Adolescent Mixer\nThursday, December 3 | 10 AM–12 PM | FLBHC Auditorium, Oakland Park\n\n${v.line} this year’s mixer for school counselors, clinicians and the programs that serve children and teens: a morning of networking, resources and a panel discussion, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Free to attend, and ${v.we} love to see you there.\n\nRSVP: ${RSVP_URL}`);
     set('social', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, December 3, at Fort Lauderdale Behavioral Health Center. A free morning of networking, resources and a panel on child and adolescent mental health, and ${v.we} love for you to join ${v.me}.\n\nRSVP to kid-ify your profile picture: ${RSVP_URL}`);
   }
+
+  // tabs (phones/tablets) and jump links
+  const panes = $('panes');
+  function showTab(t, scroll) {
+    panes.dataset.show = t; document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+    if (t === 'kit') queueMine();
+    if (scroll) { const top = document.querySelector('.tabs').getBoundingClientRect().top + scrollY; scrollTo({ top: Math.max(0, top - 4), behavior: 'smooth' }); }
+  }
+  const tabsOn = () => getComputedStyle(document.querySelector('.tabs')).display !== 'none';
+  document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab, true)));
+  document.querySelectorAll('[data-goto]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); if (tabsOn()) showTab(a.dataset.goto, true); else document.getElementById(a.dataset.goto).scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  if (location.hash === '#kit') showTab('kit', false);
   document.querySelectorAll('[data-rsvp]').forEach(a => a.addEventListener('click', () => track('rsvp_click', { platform: 'team-page' })));
   document.querySelectorAll('[data-kit]').forEach(a => a.addEventListener('click', () => track('kit_download', { platform: a.dataset.kit })));
   document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
