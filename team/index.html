@@ -371,28 +371,8 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   }
   function framedCanvas() { const c = document.createElement('canvas'); c.width = c.height = S; drawFrame(c.getContext('2d')); return c; }
   function brush(g, x, y, w, h, col, rot) { g.save(); g.translate(x + w / 2, y + h / 2); g.rotate(rot); g.fillStyle = col; g.beginPath(); const r = h / 2; g.moveTo(-w / 2 + r, -r); for (let i = 0; i <= 12; i++) g.lineTo(-w / 2 + r + (w - 2 * r) * i / 12, -r + Math.sin(i * 1.7) * 3); g.arc(w / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2); for (let i = 12; i >= 0; i--) g.lineTo(-w / 2 + r + (w - 2 * r) * i / 12, r + Math.cos(i * 1.3) * 3); g.arc(-w / 2 + r, 0, r, Math.PI / 2, Math.PI * 1.5); g.fill(); g.restore(); }
-  function storyCanvas() {
-    const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-    g.fillStyle = '#EDEEF0'; g.fillRect(0, 0, W, H);
-    const dab = (x, y, r, col) => { g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); };
-    dab(-40, 140, 260, MINT); dab(1120, 380, 220, '#E8279A'); dab(-30, 1780, 200, '#F5C02E'); dab(1110, 1640, 230, '#7B3FD6');
-    g.save(); g.translate(W / 2, 330); g.rotate(-0.03); g.fillStyle = INK; g.fillRect(-430, -170, 860, 330);
-    g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = '600 40px Oswald, sans-serif'; g.fillText('B I - A N N U A L', 0, -95);
-    g.fillStyle = MINT; g.font = '78px "Permanent Marker", cursive'; g.fillText('Child & Adolescent', 0, -5);
-    g.fillStyle = '#fff'; g.font = '150px "Permanent Marker", cursive'; g.fillText('MIXER', 0, 135);
-    brush(g, -220, 140, 440, 14, '#F5C02E', 0); g.restore();
-    if (sponsorLogo()) {
-      g.drawImage(framedCanvas(), 150, 540, 780, 780);
-      const cw = 640, ch = 190, cx = (W - cw) / 2, cy = 1360;
-      g.save(); g.shadowColor = 'rgba(14,26,48,.18)'; g.shadowBlur = 24; g.shadowOffsetY = 6; g.fillStyle = logoLight ? INK : '#FFFFFF'; g.beginPath(); g.roundRect(cx, cy, cw, ch, 24); g.fill(); g.restore();
-      g.fillStyle = RCOL.sponsoring; g.beginPath(); g.roundRect(cx, cy, 14, ch, [24, 0, 0, 24]); g.fill();
-      fitLogo(g, W / 2 + 7, cy + ch / 2, cw - 110, ch - 50);
-    } else g.drawImage(framedCanvas(), 70, 560, 940, 940);
-    g.textAlign = 'center'; g.fillStyle = INK; g.font = '700 74px Oswald, sans-serif'; g.fillText('THURSDAY, DEC 3 · 10 AM', W / 2, 1650);
-    g.fillStyle = '#4A5263'; g.font = '600 40px Oswald, sans-serif'; g.fillText('FORT LAUDERDALE BEHAVIORAL HEALTH CENTER', W / 2, 1720);
-    g.fillStyle = '#E8279A'; g.font = '62px "Permanent Marker", cursive'; g.fillText('See you there', W / 2, 1810);
-    return c;
-  }
+  // the step-2 Story uses the same themed Story as the partner kit
+  function storyCanvas() { return fmtCanvas('story'); }
   function render() {
     const P = PLAT[platform];
     if (P.story) { box.classList.add('story'); cv.width = 1080; cv.height = 1920; ctx.drawImage(storyCanvas(), 0, 0); }
