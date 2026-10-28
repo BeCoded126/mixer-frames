@@ -518,9 +518,10 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
     pts.forEach(([a, b], k) => { const px = x + a * w, py = y + b * h; k ? g.lineTo(px, py) : g.moveTo(px, py); }); g.closePath(); g.fill();
   }
   function dab(g, x, y, r, col) { g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); }
-  function tag(g, cx, cy, text, size, bg, fg) {
-    g.save(); g.translate(cx, cy); g.rotate(-0.026); g.font = `700 ${size}px Oswald, sans-serif`;
-    const sp = size * 0.14; let w = 0; for (const ch of text) w += g.measureText(ch).width + sp; w -= sp;
+  function tag(g, cx, cy, text, size, bg, fg, maxW) {
+    g.save(); g.translate(cx, cy); g.rotate(-0.026);
+    let sp, w; const meas = () => { g.font = `700 ${size}px Oswald, sans-serif`; sp = size * 0.14; w = 0; for (const ch of text) w += g.measureText(ch).width + sp; w -= sp; };
+    meas(); while (maxW && w + size * 1.2 > maxW && size > 12) { size -= 1; meas(); }
     const padX = size * 0.6, h = size * 1.45; g.fillStyle = bg; g.fillRect(-w / 2 - padX, -h / 2, w + padX * 2, h);
     g.fillStyle = fg; g.textBaseline = 'middle'; let x = -w / 2; for (const ch of text) { const cw = g.measureText(ch).width; g.textAlign = 'left'; g.fillText(ch, x, size * 0.04); x += cw + sp; }
     g.restore();
@@ -564,17 +565,17 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
     }
     g.fillStyle = INK; g.font = `700 ${50 * u}px Oswald, sans-serif`; g.fillText('THURSDAY, DEC 3 · 10 AM–12 PM', W / 2, y + 48 * u);
     g.fillStyle = '#4A5263'; g.font = `600 ${30 * u}px Oswald, sans-serif`; g.fillText('FLBHC AUDITORIUM · 951 NE 56TH ST, OAKLAND PARK', W / 2, y + 92 * u); y += B.date * u + gap;
-    const invite = isOrg() ? 'We’re inviting you to attend' : 'I’m inviting you to join me', cta = isOrg() ? 'JOIN US · RSVP FREE' : 'JOIN ME · RSVP FREE';
+    const invite = isOrg() ? 'We’re inviting you to attend' : 'I’m inviting you to join me', cta = 'RSVP TO KID-IFY YOUR PROFILE PICTURE';
     if (!print) {
       g.fillStyle = TEAL; g.font = `${48 * u}px "Permanent Marker", cursive`; g.fillText(invite, W / 2, y + 50 * u); y += B.invite * u + gap;
-      tag(g, W / 2, y + B.cta * u / 2, cta, 40 * u, MAG, '#fff');
+      tag(g, W / 2, y + B.cta * u / 2, cta, 40 * u, MAG, '#fff', 900 * u);
     } else {
       // QR on the left, invite + CTA + "scan" on the right
       const q = 250 * u, rowW = 900 * u, x0 = W / 2 - rowW / 2;
       if (qrImg) g.drawImage(qrImg, x0, y, q, q);
       const rx = x0 + q + 40 * u, rc = rx + (rowW - q - 40 * u) / 2;
       g.textAlign = 'center'; g.fillStyle = TEAL; g.font = `${fitFont(g, invite, '# "Permanent Marker", cursive', 44 * u, rowW - q - 50 * u)}px "Permanent Marker", cursive`; g.fillText(invite, rc, y + 62 * u);
-      tag(g, rc, y + 128 * u, cta, 36 * u, MAG, '#fff');
+      tag(g, rc, y + 128 * u, cta, 36 * u, MAG, '#fff', rowW - q - 40 * u);
       g.fillStyle = INK; g.font = `${34 * u}px "Permanent Marker", cursive`; g.fillText('Scan the code to RSVP', rc, y + 220 * u);
     }
   }
@@ -604,10 +605,10 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   function fillCopies() {
     const v = voice(), D = 'Thursday, December 3, 10 AM to 12 PM\nFLBHC Auditorium, 951 NE 56th Street, Oakland Park, FL 33334';
     const set = (k, t) => { const el = $('c-' + k); if (el) el.value = t; };
-    set('email', `Subject: Join ${v.me} at the Bi-Annual Child & Adolescent Mixer on Dec 3\n\nHi team,\n\n${v.line} the Bi-Annual Child & Adolescent Mixer at Fort Lauderdale Behavioral Health Center, and ${v.we} love for you to join ${v.me}.\n\n${D}\n\nIt’s a free morning of networking, resources and a panel discussion on child and adolescent mental health, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Gladys Kunik and Stephanie Breedlove, MBA, are moderating.\n\nPlease RSVP here: ${RSVP_URL}\n\nOnce you register, your confirmation email includes a link to make an “I’m attending” profile picture of yourself at age 10.${v.sign}`);
-    set('chat', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, Dec 3, 10 AM–12 PM at Fort Lauderdale Behavioral Health Center in Oakland Park. Free networking, resources and a panel on child and adolescent mental health. Who’s coming with ${v.me}?\n\nRSVP: ${RSVP_URL}`);
+    set('email', `Subject: Join ${v.me} at the Bi-Annual Child & Adolescent Mixer on Dec 3\n\nHi team,\n\n${v.line} the Bi-Annual Child & Adolescent Mixer at Fort Lauderdale Behavioral Health Center, and ${v.we} love for you to join ${v.me}.\n\n${D}\n\nIt’s a free morning of networking, resources and a panel discussion on child and adolescent mental health, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Gladys Kunik and Stephanie Breedlove, MBA, are moderating.\n\nPlease RSVP here: ${RSVP_URL}\n\nOnce you RSVP, your confirmation email includes a link to kid-ify your profile picture: you at age 10 in an “I’m attending” frame.${v.sign}`);
+    set('chat', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, Dec 3, 10 AM–12 PM at Fort Lauderdale Behavioral Health Center in Oakland Park. Free networking, resources and a panel on child and adolescent mental health. Who’s coming with ${v.me}?\n\nRSVP: ${RSVP_URL}\nOnce you RSVP, you’ll get a link to kid-ify your profile picture.`);
     set('newsletter', `Bi-Annual Child & Adolescent Mixer\nThursday, December 3 | 10 AM–12 PM | FLBHC Auditorium, Oakland Park\n\n${v.line} this year’s mixer for school counselors, clinicians and the programs that serve children and teens: a morning of networking, resources and a panel discussion, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Free to attend, and ${v.we} love to see you there.\n\nRSVP: ${RSVP_URL}`);
-    set('social', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, December 3, at Fort Lauderdale Behavioral Health Center. A free morning of networking, resources and a panel on child and adolescent mental health, and ${v.we} love for you to join ${v.me}.\n\nRSVP: ${RSVP_URL}`);
+    set('social', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, December 3, at Fort Lauderdale Behavioral Health Center. A free morning of networking, resources and a panel on child and adolescent mental health, and ${v.we} love for you to join ${v.me}.\n\nRSVP to kid-ify your profile picture: ${RSVP_URL}`);
   }
   document.querySelectorAll('[data-rsvp]').forEach(a => a.addEventListener('click', () => track('rsvp_click', { platform: 'team-page' })));
   document.querySelectorAll('[data-kit]').forEach(a => a.addEventListener('click', () => track('kit_download', { platform: a.dataset.kit })));
