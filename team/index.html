@@ -299,8 +299,8 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   const MINT = '#35D9B4', INK = '#0E1A30';
   const ROLES = { speaking: "I'M SPEAKING AT THE ", moderating: "I'M MODERATING THE ", sponsoring: "I'M SPONSORING THE ", partner: 'PROUD PARTNER OF THE ', hosting: "I'M HOSTING THE ", attending: "I'M ATTENDING THE " };
   let role = 'speaking';
-  const RCOL = { speaking: '#E8279A', moderating: '#7B3FD6', sponsoring: '#F5C02E', partner: '#3FA9F5', hosting: '#FFFFFF', attending: MINT };
-  const RFILE = r => r === 'attending' ? '../attend-frame.png' : `../frame-${r}.png`;
+  const RCOL = { speaking: '#E8279A', moderating: '#E8279A', sponsoring: '#F5C02E', partner: '#7B3FD6', hosting: '#FFFFFF', attending: MINT };
+  const RFILE = r => r === 'attending' ? '../attend-frame.png' : r === 'moderating' ? '../frame-speaking.png' : `../frame-${r}.png`;
   const overlays = {};
   let org = '', logo = null, logoLight = false;
   const ORGROLE = r => r === 'sponsoring' || r === 'partner' || r === 'hosting';
@@ -340,9 +340,10 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   function fitLogo(g, cx, cy, bw, bh) { const k = Math.min(bw / logo.width, bh / logo.height); const w = logo.width * k, h = logo.height * k; g.drawImage(logo, cx - w / 2, cy - h / 2, w, h); }
 
   function arcText(g) {
-    const O = org.trim().toUpperCase();
-    const lead = (O && role === 'sponsoring') ? O + ' IS SPONSORING THE ' : (O && role === 'partner') ? O + ' IS A PROUD PARTNER OF THE ' : (O && role === 'hosting') ? O + ' IS HOSTING THE ' : ROLES[role];
-    const parts = [[lead, '#FFFFFF'], ['C.A.A.M', RCOL[role]]];
+    const O = org.trim().toUpperCase(), col = RCOL[role];
+    // theme kit wording: org name and C.A.A.M in the role colour, e.g. SUNCOAST IS SPONSORING C.A.A.M
+    const orgLine = { sponsoring: ' IS SPONSORING ', partner: ' IS PARTNERING UP FOR ', hosting: ' IS HOSTING ' }[role];
+    const parts = (O && orgLine) ? [[O, col], [orgLine, '#FFFFFF'], ['C.A.A.M', col]] : [[ROLES[role], '#FFFFFF'], ['C.A.A.M', col]];
     const chars = []; parts.forEach(([t, col]) => { for (const ch of t) chars.push([ch, col]); });
     const maxLen = RT * ((A1 - A0) * Math.PI / 180) * 0.94;
     let fs = FS, widths, total;
