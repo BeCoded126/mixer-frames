@@ -176,7 +176,6 @@ footer a{color:var(--mint-ink)}
           <button type="button" data-r="sponsoring" aria-pressed="false"><b>Sponsor</b><span id="spLine">I’m sponsoring</span></button>
           <button type="button" data-r="partner" aria-pressed="false"><b>Partner</b><span>Proud partner of</span></button>
           <button type="button" data-r="hosting" aria-pressed="false"><b>Host team</b><span>I’m hosting</span></button>
-          <button type="button" data-r="attending" aria-pressed="false"><b>Attending</b><span>I’m attending</span></button>
         </div>
         <div id="orgBox" class="orgbox" hidden>
           <div class="field"><label for="org">Organization name</label><input id="org" maxlength="32" autocomplete="organization" placeholder="Newport Healthcare"></div>
@@ -294,9 +293,9 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   const API = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/age10';
   const S = 1080, C = S / 2, HOLE = 418, RT = 454.1, A0 = 168, A1 = 372, FS = 58, LS = 3;
   const MINT = '#35D9B4', INK = '#0E1A30';
-  const ROLES = { speaking: "I'M SPEAKING AT THE ", moderating: "I'M MODERATING THE ", sponsoring: "I'M SPONSORING THE ", partner: 'PROUD PARTNER OF THE ', hosting: "I'M HOSTING THE ", attending: "I'M ATTENDING THE " };
+  const ROLES = { speaking: "I'M SPEAKING AT THE ", moderating: "I'M MODERATING THE ", sponsoring: "I'M SPONSORING THE ", partner: 'PROUD PARTNER OF THE ', hosting: "I'M HOSTING THE " };
   let role = 'speaking';
-  const RCOL = { speaking: '#E8279A', moderating: '#E8279A', sponsoring: '#F5C02E', partner: '#7B3FD6', hosting: '#FFFFFF', attending: MINT };
+  const RCOL = { speaking: '#E8279A', moderating: '#E8279A', sponsoring: '#F5C02E', partner: '#7B3FD6', hosting: '#FFFFFF' };
   const RFILE = r => r === 'attending' ? '../attend-frame.png' : r === 'moderating' ? '../frame-speaking.png' : `../frame-${r}.png`;
   const overlays = {};
   let org = '', logo = null, logoLight = false;
@@ -604,7 +603,6 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
     return {
       speaking: { tag: 'I’M SPEAKING AT THE', ribbon: 'MEET OUR PANELIST', guess: 'Guess who grew up to be on the panel?' },
       moderating: { tag: 'I’M MODERATING THE', ribbon: 'MEET YOUR MODERATOR', guess: 'Guess who grew up to moderate the panel?' },
-      attending: { tag: 'I’M ATTENDING THE', ribbon: 'SEE YOU THERE', guess: 'Guess who? That’s me at 10' },
       sponsoring: { tag: O ? `${O} IS SPONSORING THE` : 'WE’RE SPONSORING THE', ribbon: 'PROUD SPONSOR', guess: 'Guess who? That’s me at 10' },
       partner: { tag: O ? `${O} IS PARTNERING UP FOR THE` : 'WE’RE PARTNERING UP FOR THE', ribbon: 'PROUD PARTNER', guess: 'Guess who? That’s me at 10' },
       hosting: { tag: O ? `${O} IS HOSTING THE` : 'WE’RE HOSTING THE', ribbon: 'YOUR HOST TEAM', guess: 'Guess who? That’s me at 10' },
@@ -716,7 +714,7 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   // personalized copy-and-paste invites
   function voice() {
     const O = org.trim(), nm = pname();
-    const line = { speaking: 'I’m speaking at', moderating: 'I’m moderating', attending: 'I’ll be at', sponsoring: O ? `${O} is sponsoring` : 'We’re sponsoring', partner: O ? `${O} is a proud partner of` : 'We’re a proud partner of', hosting: O ? `${O} is hosting` : 'We’re hosting' }[role];
+    const line = { speaking: 'I’m speaking at', moderating: 'I’m moderating', sponsoring: O ? `${O} is sponsoring` : 'We’re sponsoring', partner: O ? `${O} is a proud partner of` : 'We’re a proud partner of', hosting: O ? `${O} is hosting` : 'We’re hosting' }[role];
     const org_ = isOrg(); return { line, me: org_ ? 'us' : 'me', we: org_ ? 'we’d' : 'I’d', sign: nm ? `\n\n${nm}${ptitle() ? '\n' + ptitle() : ''}` : '' };
   }
   function fillCopies() {
