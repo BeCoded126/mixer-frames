@@ -593,6 +593,17 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   // person block: frame + name/title/logo/CTA (+ QR for print). layout 'row' or 'stack'
   function personBlock(g, x0, y0, w, h, u, layout, print) {
     const nm = pname(), tl = titleLines(), withLogo = isOrg() && !!logo;
+    if (layout === 'center') {
+      // frame centred, teal RSVP banner right under it, then name and title; logo card beside the frame
+      const tl1 = tl.join(' · '), fixed = 76 + (nm ? 52 : 0) + (tl1 ? 34 : 0) + 30;
+      const D = Math.max(240 * u, Math.min(w * 0.5, h - fixed * u)); let y = y0 + Math.max(0, (h - D - fixed * u) / 2);
+      const fx = x0 + w / 2 - D / 2; g.drawImage(framedCanvas(), fx, y, D, D);
+      if (withLogo) { const lw = Math.min(250 * u, x0 + w - (fx + D) - 30 * u); logoCard(g, fx + D + 20 * u + lw / 2, y + D / 2 - 70 * u, lw, 140 * u, u); }
+      y += D + 6 * u; tag(g, x0 + w / 2, y + 34 * u, CTA, 30 * u, MINT, INK, w - 60 * u); y += 82 * u; g.textAlign = 'center';
+      if (nm) { g.fillStyle = INK; g.font = `800 ${fitFont(g, nm, '800 #px Montserrat, sans-serif', 42 * u, w - 80 * u)}px Montserrat, sans-serif`; g.textBaseline = 'alphabetic'; g.fillText(nm, x0 + w / 2, y + 38 * u); y += 52 * u; }
+      if (tl1) spaced(g, tl1, x0 + w / 2, y + 22 * u, Math.min(22 * u, fitFont(g, tl1, '600 #px Oswald, sans-serif', 22 * u, w - 140 * u)), 600, MUTED, 1.1 * u, 'center');
+      return;
+    }
     if (layout === 'stack') {
       const fixed = (nm ? 64 : 0) + tl.length * 34 + (withLogo ? 164 : 0) + 84 + (print ? 230 : 0);
       const D = Math.max(260 * u, Math.min(w * 0.62, h - fixed * u - 50 * u)); let y = y0 + Math.max(0, (h - D - fixed * u - 50 * u) / 2);
@@ -635,7 +646,7 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
   }
   // full flyer in the main-flyer style
   function drawFlyer(g, W, H, kind) {
-    const u = W / 1080, print = kind === 'flyer' || kind === 'poster', layout = kind === 'story' ? 'stack' : 'row', R = roleText();
+    const u = W / 1080, print = kind === 'flyer' || kind === 'poster', layout = kind === 'story' ? 'stack' : kind === 'post' ? 'center' : 'row', R = roleText(), isPost = kind === 'post';
     g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
     const stripH = 200 * u;
     dab(g, -50 * u, 60 * u, 190 * u, MINT); dab(g, W + 40 * u, 150 * u, 210 * u, MAG); dab(g, -30 * u, H * 0.56, 95 * u, YEL); dab(g, W + 30 * u, H * 0.6, 120 * u, PUR);
@@ -643,9 +654,11 @@ RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
     dots(g, 46 * u, H * 0.4, 4, 3, 22 * u, 5.5 * u, MINT); dots(g, W - 120 * u, H * 0.43, 4, 3, 22 * u, 5.5 * u, YEL);
     let y = 34 * u; const gap = 16 * u;
     const th = 30 * u; tag(g, W / 2, y + th, R.tag, 30 * u, MAG, '#fff', W - 160 * u, -0.018); y += th * 2 + gap;
-    patch(g, W / 2, y + 129 * u, 820 * u, 0.86 * u); y += 258 * u + gap;
-    spaced(g, 'A MORNING OF NETWORKING & DISCUSSION ON', W / 2, y + 24 * u, 22 * u, 600, INK, 2.6 * u, 'center');
-    spaced(g, 'CHILD & ADOLESCENT TREATMENT & RESOURCES', W / 2, y + 54 * u, 22 * u, 600, INK, 2.6 * u, 'center'); y += 64 * u + gap;
+    const ps = isPost ? 0.72 : 0.86; patch(g, W / 2, y + 150 * ps * u, 954 * ps * u, ps * u); y += 300 * ps * u + gap;
+    if (!isPost) {
+      spaced(g, 'A MORNING OF NETWORKING & DISCUSSION ON', W / 2, y + 24 * u, 22 * u, 600, INK, 2.6 * u, 'center');
+      spaced(g, 'CHILD & ADOLESCENT TREATMENT & RESOURCES', W / 2, y + 54 * u, 22 * u, 600, INK, 2.6 * u, 'center'); y += 64 * u + gap;
+    }
     dateBar(g, W / 2, y, 920 * u, 92 * u, u); y += 92 * u + gap + 6 * u;
     tag(g, W / 2, y + 30 * u, R.ribbon, 34 * u, MAG, '#fff', W - 200 * u, -0.02); y += 64 * u + gap;
     g.textAlign = 'center'; g.fillStyle = INK; g.font = `${fitFont(g, R.guess, '#px "Permanent Marker", cursive', 30 * u, W - 160 * u)}px "Permanent Marker", cursive`; g.fillText(R.guess, W / 2, y + 30 * u); y += 44 * u + gap;
