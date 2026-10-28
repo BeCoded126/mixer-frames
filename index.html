@@ -160,7 +160,7 @@ footer a{color:var(--mint-ink)}
   };
   const $ = (id) => document.getElementById(id);
   // anonymous usage counts (no photos, names or emails are sent)
-  const TRACK = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/track';
+  const TRACK = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/kidframe';
   const qs = new URLSearchParams(location.search);
   const SOURCE = qs.get('src') || qs.get('utm_source') || (document.referrer ? (() => { try { return new URL(document.referrer).hostname; } catch (e) { return 'other'; } })() : 'direct');
   let VISITOR = '';
