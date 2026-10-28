@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mixer Partner Frame</title>
+<title>Mixer Partner Kit</title>
 <meta name="description" content="Make your age-10 profile picture frame (speaking, moderating, sponsoring, partner or host) for the Bi-Annual Child & Adolescent Mixer, Dec 3 at Fort Lauderdale Behavioral Health Center.">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://becoded126.github.io/mixer-frames/team/">
-<meta property="og:title" content="Your Mixer profile picture: speakers, sponsors and partners">
+<meta property="og:title" content="Mixer partner kit: profile frames, flyers and invites">
 <meta property="og:description" content="Upload a photo, see yourself at 10, and get your role frame (speaking, moderating, sponsoring, partner or host) for the Bi-Annual Child &amp; Adolescent Mixer, Dec 3.">
 <meta property="og:image" content="https://becoded126.github.io/mixer-frames/share-preview.jpg">
 <meta property="og:image:width" content="1200">
@@ -81,6 +81,34 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 .fallback img{max-width:260px;width:100%;border-radius:12px}
 .orgbox{display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--line);padding-top:14px}
 .orgbox .field input{text-transform:none;letter-spacing:0}
+.btn.mag{background:var(--mag);color:#fff}
+.ctarow{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.kit{display:flex;flex-direction:column;gap:18px;scroll-margin-top:16px}
+.kithead{background:var(--ink);color:#fff;border-radius:22px;padding:24px 24px 26px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.kithead h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,44px);line-height:1.1;color:var(--mint)}
+.kithead p{margin:0;max-width:60ch;color:#C9D2E3}
+.kithead .btn.ghost{color:#fff;border-color:rgba(255,255,255,.35)}
+.kithead>*{position:relative;z-index:1}
+.kithead::after{content:"";position:absolute;right:-46px;bottom:-56px;width:130px;height:130px;border-radius:50%;background:var(--mag);z-index:0}
+.kit h3{margin:6px 0 0;font-family:var(--label);font-weight:700;font-size:17px;letter-spacing:.14em;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.card{background:var(--card);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card .thumb{background:var(--paper);border-radius:12px;aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .thumb img{max-width:100%;max-height:100%;display:block}
+.card b{font-family:var(--label);letter-spacing:.08em;text-transform:uppercase;font-size:15px}
+.card span{font-size:13px;color:var(--muted)}
+.card .btn{align-self:flex-start;padding:10px 16px;min-height:40px;font-size:13px}
+.copies{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.copy{background:var(--card);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.copy textarea{width:100%;min-height:190px;resize:vertical;font:500 14px/1.5 var(--body);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.copy .row{justify-content:space-between}
+@media (max-width:480px){.cards{grid-template-columns:1fr 1fr}.card .btn{font-size:12px;padding:9px 12px}.copies{grid-template-columns:minmax(0,1fr)}}
+.mine{background:var(--card);border-radius:22px;padding:18px;display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:640px){.mine{grid-template-columns:minmax(0,1fr)}}
+.mineprev canvas{width:100%;height:auto;display:block;border-radius:12px;box-shadow:0 4px 16px rgba(14,26,48,.12)}
+.mineform{display:flex;flex-direction:column;gap:12px;min-width:0}
+.mineform .field input{text-transform:none;letter-spacing:0}
+.mineBtns{display:flex;flex-wrap:wrap;gap:8px}
 footer{font-size:13px;color:var(--muted)}
 footer a{color:var(--mint-ink)}
 </style>
@@ -90,7 +118,8 @@ footer a{color:var(--mint-ink)}
   <header>
     <div class="kicker">Dec 3 · Fort Lauderdale Behavioral Health Center</div>
     <div class="patch" role="img" aria-label="Bi-Annual Child and Adolescent Mixer"><small>BI-ANNUAL</small><span class="ca">Child &amp; Adolescent</span>MIXER<i class="u"></i></div>
-    <p>For our panelists, moderators, sponsors, partners and hosts. Pick your role, upload a photo, and we’ll turn it into you at age 10 inside your frame, sized for wherever you’re posting it.</p>
+    <p>For our panelists, moderators, sponsors, partners and hosts. Make your profile frame below, then grab the flyers, posts and ready-to-send invites to bring your team.</p>
+    <div class="ctarow"><a class="btn mag" data-rsvp href="https://lp.constantcontactpages.com/ev/reg/5xmw7m4" target="_blank" rel="noopener">RSVP for Dec 3</a><a class="btn ghost" href="#kit">Get the share kit ↓</a></div>
   </header>
 
   <section class="studio">
@@ -116,7 +145,7 @@ footer a{color:var(--mint-ink)}
           <div class="drop" id="logoDrop">
             <label class="btn dark" for="logoFile">Add logo</label>
             <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
-            <span id="logoName">Your logo goes on the Story version. We clear its background for you.</span>
+            <span id="logoName">Your logo goes on your Story and your kit below. We clear its background for you.</span>
           </div>
         </div>
       </div>
@@ -164,6 +193,61 @@ footer a{color:var(--mint-ink)}
     </div>
   </section>
 
+  <section class="kit" id="kit">
+    <div class="kithead">
+      <h2>Bring your team</h2>
+      <p>Flyers, posts and ready-to-send invites for your staff and network. Everything points to the RSVP page, and it’s free to attend.</p>
+      <div class="ctarow"><a class="btn mag" data-rsvp href="https://lp.constantcontactpages.com/ev/reg/5xmw7m4" target="_blank" rel="noopener">RSVP for Dec 3</a><a class="btn ghost" href="../kit/mixer-partner-kit.zip" download data-kit="zip">Download everything (.zip)</a></div>
+    </div>
+    <h3>Your personalized kit</h3>
+    <div class="mine">
+      <div class="mineprev"><canvas id="pv" width="1080" height="1350" aria-label="Preview of your personalized post"></canvas></div>
+      <div class="mineform">
+        <p class="tip" id="mineTip">Built from your role and photo at the top of the page. Add your name so people know who’s inviting them.</p>
+        <div class="field"><label for="pname">Your name</label><input id="pname" maxlength="40" autocomplete="name" placeholder="Stephanie Breedlove, MBA"></div>
+        <div class="field"><label for="ptitle">Title and organization</label><input id="ptitle" maxlength="70" placeholder="Clinical Outreach, Discovery Behavioral Health"></div>
+        <div class="mineBtns">
+          <button type="button" class="btn dark" data-mine="post">Feed post</button>
+          <button type="button" class="btn dark" data-mine="story">Story</button>
+          <button type="button" class="btn dark" data-mine="print">Printable invite</button>
+        </div>
+        <span class="status" id="mineStatus" aria-live="polite">Feed post 1080×1350 · Story 1080×1920 · Printable invite 8.5×11 with RSVP QR code</span>
+      </div>
+    </div>
+    <h3>Event flyers to share</h3>
+    <div class="cards"><div class="card"><div class="thumb"><img src="../kit/t-post.jpg" alt="Feed post preview" loading="lazy"></div><b>Feed post</b><span>Instagram, LinkedIn, Facebook · 1080×1350</span><a class="btn dark" href="../kit/mixer-feed-post-1080x1350.png" download data-kit="post">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-story.jpg" alt="Story preview" loading="lazy"></div><b>Story</b><span>Instagram or Facebook Story · 1080×1920. Add a link sticker to the RSVP page.</span><a class="btn dark" href="../kit/mixer-story-1080x1920.png" download data-kit="story">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-banner.jpg" alt="Email signature banner preview" loading="lazy"></div><b>Email signature banner</b><span>Outlook or Gmail · display at 600×150</span><a class="btn dark" href="../kit/mixer-email-banner-1200x300.png" download data-kit="banner">Download</a></div><div class="card"><div class="thumb"><img src="../kit/t-flyer.jpg" alt="Flyer, high resolution preview" loading="lazy"></div><b>Flyer, high resolution</b><span>For intranets, newsletters and screens · 2160×2700</span><a class="btn dark" href="../kit/mixer-flyer-2160x2700.png" download data-kit="flyer">Download</a></div></div>
+    <h3>Event flyers to print</h3>
+    <div class="cards"><div class="card"><div class="thumb"><img src="../kit/t-letter.jpg" alt="Flyer, letter size preview" loading="lazy"></div><b>Flyer, letter size</b><span>8.5×11 PDF with an RSVP QR code. Break rooms, front desks, team meetings.</span><a class="btn dark" href="../kit/mixer-flyer-letter.pdf" download data-kit="letter">Download PDF</a></div><div class="card"><div class="thumb"><img src="../kit/t-poster.jpg" alt="Poster, 11×17 preview" loading="lazy"></div><b>Poster, 11×17</b><span>Tabloid PDF with an RSVP QR code for bulletin boards and lobbies.</span><a class="btn dark" href="../kit/mixer-poster-11x17.pdf" download data-kit="poster">Download PDF</a></div></div>
+    <h3>Copy and paste</h3>
+    <div class="copies"><div class="copy"><b class="kicker" style="letter-spacing:.12em">Email to your team</b><textarea readonly id="c-email" aria-label="Email to your team">Subject: Join us Dec 3 at the Bi-Annual Child &amp; Adolescent Mixer
+
+Hi team,
+
+We’re part of the Bi-Annual Child &amp; Adolescent Mixer at Fort Lauderdale Behavioral Health Center, and we’d love for you to come with us.
+
+Thursday, December 3, 10 AM to 12 PM
+FLBHC Auditorium, 951 NE 56th Street, Oakland Park, FL 33334
+
+It’s a free morning of networking, resources and a panel discussion on child and adolescent mental health, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Gladys Kunik and Stephanie Breedlove, MBA, are moderating.
+
+Please RSVP here: https://lp.constantcontactpages.com/ev/reg/5xmw7m4
+
+Once you register, your confirmation email includes a link to make an “I’m attending” profile picture of yourself at age 10.</textarea>
+<div class="row"><button type="button" class="btn" data-copy="email">Copy</button><span class="status" aria-live="polite"></span></div></div><div class="copy"><b class="kicker" style="letter-spacing:.12em">Teams or Slack message</b><textarea readonly id="c-chat" aria-label="Teams or Slack message">Who’s coming with us? The Bi-Annual Child &amp; Adolescent Mixer is Thursday, Dec 3, 10 AM–12 PM at Fort Lauderdale Behavioral Health Center in Oakland Park. Free networking, resources and a panel on child and adolescent mental health.
+
+RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
+<div class="row"><button type="button" class="btn" data-copy="chat">Copy</button><span class="status" aria-live="polite"></span></div></div><div class="copy"><b class="kicker" style="letter-spacing:.12em">Newsletter blurb</b><textarea readonly id="c-newsletter" aria-label="Newsletter blurb">Bi-Annual Child &amp; Adolescent Mixer
+Thursday, December 3 | 10 AM–12 PM | FLBHC Auditorium, Oakland Park
+
+Join school counselors, clinicians and the programs that serve children and teens for a morning of networking, resources and a panel discussion, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Free to attend.
+
+RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
+<div class="row"><button type="button" class="btn" data-copy="newsletter">Copy</button><span class="status" aria-live="polite"></span></div></div><div class="copy"><b class="kicker" style="letter-spacing:.12em">Social post caption</b><textarea readonly id="c-social" aria-label="Social post caption">We’ll be at the Bi-Annual Child &amp; Adolescent Mixer on Thursday, December 3, at Fort Lauderdale Behavioral Health Center. A free morning of networking, resources and a panel on child and adolescent mental health. Come say hi.
+
+RSVP: https://lp.constantcontactpages.com/ev/reg/5xmw7m4</textarea>
+<div class="row"><button type="button" class="btn" data-copy="social">Copy</button><span class="status" aria-live="polite"></span></div></div></div>
+  </section>
+
   <footer>Bi-Annual Child &amp; Adolescent Mixer · Thursday, December 3 · 10 AM–12 PM · FLBHC Auditorium, 951 NE 56th Street, Oakland Park, FL 33334. Hosted by Fort Lauderdale Behavioral Health Center with Discovery Behavioral Health.</footer>
 </div>
 
@@ -178,7 +262,8 @@ footer a{color:var(--mint-ink)}
   const RFILE = r => r === 'attending' ? '../attend-frame.png' : `../frame-${r}.png`;
   const overlays = {};
   let org = '', logo = null, logoLight = false;
-  const sponsorLogo = () => role === 'sponsoring' && !!logo;
+  const ORGROLE = r => r === 'sponsoring' || r === 'partner' || r === 'hosting';
+  const sponsorLogo = () => ORGROLE(role) && !!logo;
   const PLAT = {
     instagram: { size: 1080, tip: 'Instagram shows profile pictures as a circle, and the frame is already round.' },
     linkedin: { size: 800, tip: 'LinkedIn crops to a circle. Upload it from your profile photo, then skip the crop.' },
@@ -214,7 +299,8 @@ footer a{color:var(--mint-ink)}
   function fitLogo(g, cx, cy, bw, bh) { const k = Math.min(bw / logo.width, bh / logo.height); const w = logo.width * k, h = logo.height * k; g.drawImage(logo, cx - w / 2, cy - h / 2, w, h); }
 
   function arcText(g) {
-    const lead = (role === 'sponsoring' && org.trim()) ? org.trim().toUpperCase() + ' IS SPONSORING THE ' : ROLES[role];
+    const O = org.trim().toUpperCase();
+    const lead = (O && role === 'sponsoring') ? O + ' IS SPONSORING THE ' : (O && role === 'partner') ? O + ' IS A PROUD PARTNER OF THE ' : (O && role === 'hosting') ? O + ' IS HOSTING THE ' : ROLES[role];
     const parts = [[lead, '#FFFFFF'], ['C.A.A.M', RCOL[role]]];
     const chars = []; parts.forEach(([t, col]) => { for (const ch of t) chars.push([ch, col]); });
     const maxLen = RT * ((A1 - A0) * Math.PI / 180) * 0.94;
@@ -274,6 +360,7 @@ footer a{color:var(--mint-ink)}
     if (P.story) { box.classList.add('story'); cv.width = 1080; cv.height = 1920; ctx.drawImage(storyCanvas(), 0, 0); }
     else { box.classList.remove('story'); cv.width = cv.height = S; drawFrame(ctx); }
     $('hint').hidden = !!P.story;
+    if (typeof queueMine === 'function') queueMine();
   }
   function refreshButtons() {
     const ready = !!original;
@@ -326,7 +413,7 @@ footer a{color:var(--mint-ink)}
   $('reset').addEventListener('click', () => { zoomIn.value = 100; offX = offY = 0; render(); });
 
   document.querySelectorAll('[data-r]').forEach(b => b.addEventListener('click', () => {
-    role = b.dataset.r; document.querySelectorAll('[data-r]').forEach(x => x.setAttribute('aria-pressed', x === b)); $('orgBox').hidden = role !== 'sponsoring'; refreshButtons(); setRole();
+    role = b.dataset.r; document.querySelectorAll('[data-r]').forEach(x => x.setAttribute('aria-pressed', x === b)); $('orgBox').hidden = !ORGROLE(role); refreshButtons(); setRole();
   }));
   document.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => {
     platform = b.dataset.p; document.querySelectorAll('[data-p]').forEach(x => x.setAttribute('aria-pressed', x === b));
@@ -397,7 +484,7 @@ footer a{color:var(--mint-ink)}
     if (P.story) out = storyCanvas();
     else { out = document.createElement('canvas'); out.width = out.height = P.size; const g = out.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(framedCanvas(), 0, 0, P.size, P.size); }
     const blob = await new Promise(r => out.toBlob(r, 'image/png'));
-    const slug = (role === 'sponsoring' && org.trim()) ? org.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' : '';
+    const slug = (ORGROLE(role) && org.trim()) ? org.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' : '';
     const name = `mixer-${slug}${role}-${platform}${use === 'kid' ? '-age10' : ''}.png`;
     track('download', { platform, version: use === 'kid' ? 'age10' : 'today' });
     const file = new File([blob], name, { type: 'image/png' });
@@ -409,6 +496,127 @@ footer a{color:var(--mint-ink)}
     fallbackImg.src = out.toDataURL('image/png'); fallback.hidden = false;
     saveStatus.textContent = 'Downloaded. If nothing saved, use the image below.';
   });
+
+
+  // ---------- personalized kit ----------
+  const RSVP_URL = 'https://lp.constantcontactpages.com/ev/reg/5xmw7m4';
+  const PAPER = '#EDEEF0', MAG = '#E8279A', YEL = '#F5C02E', PUR = '#7B3FD6', TEAL = '#0F8F78';
+  let qrImg = null; loadImg('../kit/rsvp-qr.png').then(i => { qrImg = i; queueMine(); });
+  const isOrg = () => ORGROLE(role);
+  const pname = () => $('pname').value.trim(), ptitle = () => $('ptitle').value.trim();
+  function headline() {
+    const O = org.trim();
+    if (role === 'sponsoring') return O ? [O, 'is sponsoring the'] : ['We’re sponsoring the'];
+    if (role === 'partner') return O ? [O, 'is a proud partner of the'] : ['We’re a proud partner of the'];
+    if (role === 'hosting') return O ? [O, 'is hosting the'] : ['We’re hosting the'];
+    return [{ speaking: 'I’m speaking at the', moderating: 'I’m moderating the', attending: 'I’m attending the' }[role]];
+  }
+  function fitFont(g, text, font, size, maxW) { let s = size; do { g.font = font.replace('#', s); if (g.measureText(text).width <= maxW) break; s -= 2; } while (s > 16); return s; }
+  function roughRect(g, x, y, w, h, col) {
+    g.fillStyle = col; g.beginPath();
+    const pts = [[0, .04], [.3, 0], [.62, .03], [.99, 0], [1, .46], [.98, 1], [.66, .97], [.33, 1], [0, .97], [.02, .52]];
+    pts.forEach(([a, b], k) => { const px = x + a * w, py = y + b * h; k ? g.lineTo(px, py) : g.moveTo(px, py); }); g.closePath(); g.fill();
+  }
+  function dab(g, x, y, r, col) { g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); }
+  function tag(g, cx, cy, text, size, bg, fg) {
+    g.save(); g.translate(cx, cy); g.rotate(-0.026); g.font = `700 ${size}px Oswald, sans-serif`;
+    const sp = size * 0.14; let w = 0; for (const ch of text) w += g.measureText(ch).width + sp; w -= sp;
+    const padX = size * 0.6, h = size * 1.45; g.fillStyle = bg; g.fillRect(-w / 2 - padX, -h / 2, w + padX * 2, h);
+    g.fillStyle = fg; g.textBaseline = 'middle'; let x = -w / 2; for (const ch of text) { const cw = g.measureText(ch).width; g.textAlign = 'left'; g.fillText(ch, x, size * 0.04); x += cw + sp; }
+    g.restore();
+  }
+  function patch(g, cx, cy, w, s) {
+    g.save(); g.translate(cx, cy); g.rotate(-0.035); const h = 300 * s;
+    roughRect(g, -w / 2, -h / 2, w, h, INK); g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    g.fillStyle = '#fff'; g.font = `600 ${30 * s}px Oswald, sans-serif`; g.fillText('B I - A N N U A L', 0, -h / 2 + 62 * s);
+    g.fillStyle = MINT; g.font = `${66 * s}px "Permanent Marker", cursive`; g.fillText('Child & Adolescent', 0, -h / 2 + 146 * s);
+    g.fillStyle = '#fff'; g.font = `${124 * s}px "Permanent Marker", cursive`; g.fillText('MIXER', 0, -h / 2 + 262 * s);
+    brush(g, -170 * s, -h / 2 + 274 * s, 340 * s, 11 * s, YEL, 0); g.restore();
+  }
+  // draws a portrait promo onto g (W x H); print adds the RSVP QR row
+  function drawPromo(g, W, H, print) {
+    const u = W / 1080, hl = headline(), nm = pname(), tt = ptitle(), withLogo = isOrg() && !!logo, two = hl.length === 2;
+    g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
+    dab(g, -40 * u, H * 0.34, 150 * u, MINT); dab(g, W + 30 * u, H * 0.05, 170 * u, MAG); dab(g, -30 * u, H * 0.95, 120 * u, YEL); dab(g, W + 25 * u, H * 0.66, 120 * u, PUR);
+    const B = { top: 50, hl: two ? 150 : 82, patch: 228, name: (nm || tt) ? (nm && tt ? 104 : 60) : 0, logo: withLogo ? 190 : 0, date: 94, invite: print ? 0 : 62, cta: print ? 0 : 74, qr: print ? 250 : 0, bottom: 50 };
+    const gapsN = (print ? 5 : 6) + (B.name ? 1 : 0) + (B.logo ? 1 : 0), gap0 = 16;
+    const fixed = Object.values(B).reduce((a, b) => a + b, 0) * u + gapsN * gap0 * u;
+    let D = Math.min(W * 0.6, H - fixed); D = Math.max(D, 300 * u);
+    const extra = Math.max(0, H - fixed - D), gap = gap0 * u + extra / (gapsN + 2);
+    let y = B.top * u + extra / (gapsN + 2);
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    if (two) {
+      g.fillStyle = INK; const s1 = fitFont(g, hl[0], '# "Permanent Marker", cursive', 74 * u, 960 * u); g.font = `${s1}px "Permanent Marker", cursive`; g.fillText(hl[0], W / 2, y + 70 * u);
+      g.fillStyle = MAG; const s2 = fitFont(g, hl[1], '# "Permanent Marker", cursive', 54 * u, 960 * u); g.font = `${s2}px "Permanent Marker", cursive`; g.fillText(hl[1], W / 2, y + 138 * u);
+    } else { g.fillStyle = INK; const s1 = fitFont(g, hl[0], '# "Permanent Marker", cursive', 66 * u, 960 * u); g.font = `${s1}px "Permanent Marker", cursive`; g.fillText(hl[0], W / 2, y + 66 * u); }
+    y += B.hl * u + gap;
+    patch(g, W / 2, y + B.patch * u / 2, 720 * u, 0.76 * u); y += B.patch * u + gap;
+    g.drawImage(framedCanvas(), W / 2 - D / 2, y, D, D); y += D + gap;
+    if (B.name) {
+      if (nm) { g.fillStyle = INK; const s = fitFont(g, nm, '800 #px Montserrat, sans-serif', 50 * u, 940 * u); g.font = `800 ${s}px Montserrat, sans-serif`; g.fillText(nm, W / 2, y + 48 * u); }
+      if (tt) { g.fillStyle = '#4A5263'; const t = tt.toUpperCase(); const s = fitFont(g, t, '600 #px Oswald, sans-serif', 30 * u, 940 * u); g.font = `600 ${s}px Oswald, sans-serif`; g.fillText(t, W / 2, y + (nm ? 96 : 44) * u); }
+      y += B.name * u + gap;
+    }
+    if (B.logo) {
+      const cw = 560 * u, ch = 190 * u, cx = W / 2 - cw / 2; g.save(); g.shadowColor = 'rgba(14,26,48,.16)'; g.shadowBlur = 20 * u; g.shadowOffsetY = 5 * u;
+      g.fillStyle = logoLight ? INK : '#fff'; g.beginPath(); g.roundRect(cx, y, cw, ch, 20 * u); g.fill(); g.restore();
+      fitLogo(g, W / 2, y + ch / 2, cw - 70 * u, ch - 34 * u); y += ch + gap;
+    }
+    g.fillStyle = INK; g.font = `700 ${50 * u}px Oswald, sans-serif`; g.fillText('THURSDAY, DEC 3 · 10 AM–12 PM', W / 2, y + 48 * u);
+    g.fillStyle = '#4A5263'; g.font = `600 ${30 * u}px Oswald, sans-serif`; g.fillText('FLBHC AUDITORIUM · 951 NE 56TH ST, OAKLAND PARK', W / 2, y + 92 * u); y += B.date * u + gap;
+    const invite = isOrg() ? 'We’re inviting you to attend' : 'I’m inviting you to join me', cta = isOrg() ? 'JOIN US · RSVP FREE' : 'JOIN ME · RSVP FREE';
+    if (!print) {
+      g.fillStyle = TEAL; g.font = `${48 * u}px "Permanent Marker", cursive`; g.fillText(invite, W / 2, y + 50 * u); y += B.invite * u + gap;
+      tag(g, W / 2, y + B.cta * u / 2, cta, 40 * u, MAG, '#fff');
+    } else {
+      // QR on the left, invite + CTA + "scan" on the right
+      const q = 250 * u, rowW = 900 * u, x0 = W / 2 - rowW / 2;
+      if (qrImg) g.drawImage(qrImg, x0, y, q, q);
+      const rx = x0 + q + 40 * u, rc = rx + (rowW - q - 40 * u) / 2;
+      g.textAlign = 'center'; g.fillStyle = TEAL; g.font = `${fitFont(g, invite, '# "Permanent Marker", cursive', 44 * u, rowW - q - 50 * u)}px "Permanent Marker", cursive`; g.fillText(invite, rc, y + 62 * u);
+      tag(g, rc, y + 128 * u, cta, 36 * u, MAG, '#fff');
+      g.fillStyle = INK; g.font = `${34 * u}px "Permanent Marker", cursive`; g.fillText('Scan the code to RSVP', rc, y + 220 * u);
+    }
+  }
+  function promoCanvas(kind) {
+    const [W, H] = kind === 'story' ? [1080, 1920] : kind === 'print' ? [2550, 3300] : [1080, 1350];
+    const c = document.createElement('canvas'); c.width = W; c.height = H; drawPromo(c.getContext('2d'), W, H, kind === 'print'); return c;
+  }
+  let mineQueued = false;
+  function queueMine() { if (mineQueued) return; mineQueued = true; requestAnimationFrame(() => { mineQueued = false; const pv = $('pv'); if (pv) drawPromo(pv.getContext('2d'), 1080, 1350, false); fillCopies(); }); }
+  async function deliver(c, name) {
+    const blob = await new Promise(r => c.toBlob(r, 'image/png')); const file = new File([blob], name, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) { try { await navigator.share({ files: [file] }); return 'Saved.'; } catch (e) { if (e && e.name === 'AbortError') return ''; } }
+    const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); return 'Downloaded.';
+  }
+  document.querySelectorAll('[data-mine]').forEach(b => b.addEventListener('click', async () => {
+    const k = b.dataset.mine, who = (pname() || org.trim() || 'my').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const msg = await deliver(promoCanvas(k), `mixer-${who}-${role}-${k === 'print' ? 'invite-letter' : k}.png`);
+    $('mineStatus').textContent = msg + (k === 'print' && msg ? ' Print it at 8.5×11, fit to page.' : ''); track('kit_download', { platform: 'mine-' + k, version: role.slice(0, 10) });
+  }));
+  ['pname', 'ptitle'].forEach(id => $(id).addEventListener('input', queueMine));
+  // personalized copy-and-paste invites
+  function voice() {
+    const O = org.trim(), nm = pname();
+    const line = { speaking: 'I’m speaking at', moderating: 'I’m moderating', attending: 'I’ll be at', sponsoring: O ? `${O} is sponsoring` : 'We’re sponsoring', partner: O ? `${O} is a proud partner of` : 'We’re a proud partner of', hosting: O ? `${O} is hosting` : 'We’re hosting' }[role];
+    const org_ = isOrg(); return { line, me: org_ ? 'us' : 'me', we: org_ ? 'we’d' : 'I’d', sign: nm ? `\n\n${nm}${ptitle() ? '\n' + ptitle() : ''}` : '' };
+  }
+  function fillCopies() {
+    const v = voice(), D = 'Thursday, December 3, 10 AM to 12 PM\nFLBHC Auditorium, 951 NE 56th Street, Oakland Park, FL 33334';
+    const set = (k, t) => { const el = $('c-' + k); if (el) el.value = t; };
+    set('email', `Subject: Join ${v.me} at the Bi-Annual Child & Adolescent Mixer on Dec 3\n\nHi team,\n\n${v.line} the Bi-Annual Child & Adolescent Mixer at Fort Lauderdale Behavioral Health Center, and ${v.we} love for you to join ${v.me}.\n\n${D}\n\nIt’s a free morning of networking, resources and a panel discussion on child and adolescent mental health, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Gladys Kunik and Stephanie Breedlove, MBA, are moderating.\n\nPlease RSVP here: ${RSVP_URL}\n\nOnce you register, your confirmation email includes a link to make an “I’m attending” profile picture of yourself at age 10.${v.sign}`);
+    set('chat', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, Dec 3, 10 AM–12 PM at Fort Lauderdale Behavioral Health Center in Oakland Park. Free networking, resources and a panel on child and adolescent mental health. Who’s coming with ${v.me}?\n\nRSVP: ${RSVP_URL}`);
+    set('newsletter', `Bi-Annual Child & Adolescent Mixer\nThursday, December 3 | 10 AM–12 PM | FLBHC Auditorium, Oakland Park\n\n${v.line} this year’s mixer for school counselors, clinicians and the programs that serve children and teens: a morning of networking, resources and a panel discussion, co-hosted by Fort Lauderdale Behavioral Health Center and Discovery Behavioral Health. Free to attend, and ${v.we} love to see you there.\n\nRSVP: ${RSVP_URL}`);
+    set('social', `${v.line} the Bi-Annual Child & Adolescent Mixer on Thursday, December 3, at Fort Lauderdale Behavioral Health Center. A free morning of networking, resources and a panel on child and adolescent mental health, and ${v.we} love for you to join ${v.me}.\n\nRSVP: ${RSVP_URL}`);
+  }
+  document.querySelectorAll('[data-rsvp]').forEach(a => a.addEventListener('click', () => track('rsvp_click', { platform: 'team-page' })));
+  document.querySelectorAll('[data-kit]').forEach(a => a.addEventListener('click', () => track('kit_download', { platform: a.dataset.kit })));
+  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    const ta = $('c-' + b.dataset.copy), st = b.parentElement.querySelector('.status');
+    try { await navigator.clipboard.writeText(ta.value); } catch (e) { ta.focus(); ta.select(); try { document.execCommand('copy'); } catch (e2) {} }
+    st.textContent = 'Copied'; setTimeout(() => { st.textContent = ''; }, 2500);
+    track('copy_invite', { platform: b.dataset.copy });
+  }));
 
   track('view');
   function setRole() { if (overlays[role]) { overlay = overlays[role]; render(); return; } const r = role; loadImg(RFILE(r)).then(i => { overlays[r] = i; if (role === r) { overlay = i; render(); } }); }
