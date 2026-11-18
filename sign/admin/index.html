@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yearbook notes: admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Oswald:wght@500;600;700&family=Montserrat:wght@500;600;800&display=swap">
+<style>
+:root{--paper:#EDEEF0;--ink:#0E1A30;--muted:#4A5263;--mint:#35D9B4;--mag:#E8279A;--yel:#F5C02E;--line:#D4D8E0;--rule:#B9D3F0;color-scheme:light}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:500 15px/1.5 Montserrat,Arial,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:26px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1{margin:0;font:400 clamp(30px,6vw,44px)/1.1 'Permanent Marker',cursive}
+.card{background:#fff;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+label,.lbl{font:600 13px Oswald,Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+input{font:600 16px Montserrat,Arial,sans-serif;padding:12px;border:2px solid var(--line);border-radius:10px;width:100%;max-width:340px}
+.btn{appearance:none;border:0;cursor:pointer;font:700 14px Oswald,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:11px 18px;border-radius:6px;color:var(--ink);background:var(--mint);min-height:44px}
+.btn.dark{background:var(--ink);color:#fff}.btn.ghost{background:transparent;border:2px solid var(--line);font-size:12px;padding:8px 12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.muted{color:var(--muted);font-size:14px}.err{color:#B3261E;font-weight:600}
+.count{font:400 26px 'Permanent Marker',cursive}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.note{background:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sheet{aspect-ratio:5/3;border-radius:4px;background:#fff repeating-linear-gradient(180deg,transparent 0,transparent calc(20% - 2px),var(--rule) calc(20% - 2px),var(--rule) 20%);border:1px solid var(--line)}
+.sheet img{width:100%;height:100%;display:block}
+.who b{display:block;font-weight:800}
+.meta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+code{font-size:12.5px;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Yearbook notes</h1>
+
+  <form class="card" id="gate">
+    <label for="pass">Admin passcode</label>
+    <input id="pass" type="password" autocomplete="current-password">
+    <div class="row"><button class="btn dark" type="submit">Open</button><span class="err" id="gateErr" role="alert"></span></div>
+    <p class="muted">Private page for the Sign My Yearbook notes. Nothing loads without the passcode.</p>
+  </form>
+
+  <div id="main" hidden>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="count" id="count"></div>
+        <div class="row">
+          <button class="btn" id="zip" type="button">Download all PNGs</button>
+          <button class="btn ghost" id="csv" type="button">Details (CSV)</button>
+          <button class="btn ghost" id="refresh" type="button">Refresh</button>
+        </div>
+      </div>
+      <p class="muted" id="status">Each PNG is 1800 x 1080 with a transparent background, handwriting only. The lined paper below is just for previewing.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(() => {
+  const API = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/yearbook';
+  const $ = (id) => document.getElementById(id);
+  const NEED = 10;
+  let pass = '', notes = [];
+  try { pass = sessionStorage.getItem('ybPass') || ''; } catch (e) {}
+
+  async function call(body) {
+    const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ pass }, body)) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.message || 'Something went wrong. Try again.'), { status: res.status });
+    return data;
+  }
+  const when = (t) => new Date(t).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' ET';
+  function save(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
+  const csvText = () => [['Name', 'Organization', 'Pen color', 'Pen hex', 'Submitted (ET)', 'File'], ...notes.map((n) => [n.full_name, n.organization, n.pen_color, n.pen_hex, when(n.submitted_at), n.file_name])]
+    .map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+
+  function render() {
+    $('count').textContent = notes.length + ' of ' + NEED + ' notes in';
+    $('zip').disabled = $('csv').disabled = !notes.length;
+    const grid = $('grid'); grid.replaceChildren();
+    if (!notes.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'No notes yet. They show up here as soon as someone taps Send.'; grid.append(p); return; }
+    notes.forEach((n) => {
+      const card = document.createElement('div'); card.className = 'note';
+      const sheet = document.createElement('div'); sheet.className = 'sheet';
+      const img = document.createElement('img'); img.alt = 'Note from ' + n.full_name; img.loading = 'lazy'; if (n.url) img.src = n.url; sheet.append(img);
+      const who = document.createElement('div'); who.className = 'who';
+      const b = document.createElement('b'); b.textContent = n.full_name; who.append(b, document.createTextNode(n.organization));
+      const meta = document.createElement('div'); meta.className = 'meta';
+      const col = document.createElement('span'); const sw = document.createElement('i'); sw.className = 'sw'; sw.style.background = n.pen_hex; col.append(sw, document.createTextNode(n.pen_color + ' ' + n.pen_hex));
+      const t = document.createElement('span'); t.textContent = when(n.submitted_at);
+      const f = document.createElement('code'); f.textContent = n.file_name; meta.append(col, t, f);
+      const row = document.createElement('div'); row.className = 'row';
+      const dl = document.createElement('button'); dl.className = 'btn ghost'; dl.type = 'button'; dl.textContent = 'Download PNG';
+      dl.addEventListener('click', async () => { const r = await fetch(n.url); save(await r.blob(), n.file_name); });
+      const rm = document.createElement('button'); rm.className = 'btn ghost'; rm.type = 'button'; rm.textContent = 'Remove'; let armed = null;
+      rm.addEventListener('click', async () => {
+        if (!armed) { rm.textContent = 'Click again to delete'; armed = setTimeout(() => { rm.textContent = 'Remove'; armed = null; }, 4000); return; }
+        clearTimeout(armed); rm.disabled = true;
+        try { await call({ action: 'remove', id: n.id }); await load(); } catch (e) { $('status').textContent = e.message; rm.disabled = false; }
+      });
+      row.append(dl, rm); card.append(sheet, who, meta, row); grid.append(card);
+    });
+  }
+  async function load() {
+    const data = await call({ action: 'list' });
+    notes = data.notes || []; $('gate').hidden = true; $('main').hidden = false; render();
+  }
+  $('gate').addEventListener('submit', async (e) => {
+    e.preventDefault(); pass = $('pass').value.trim(); $('gateErr').textContent = '';
+    try { await load(); try { sessionStorage.setItem('ybPass', pass); } catch (x) {} } catch (err) { $('gateErr').textContent = err.status === 401 ? 'That passcode isn’t right.' : err.message; }
+  });
+  $('refresh').addEventListener('click', () => load().catch((e) => { $('status').textContent = e.message; }));
+  $('csv').addEventListener('click', () => save(new Blob(['﻿' + csvText()], { type: 'text/csv' }), 'yearbook-notes-details.csv'));
+  $('zip').addEventListener('click', async () => {
+    const btn = $('zip'); btn.disabled = true; btn.textContent = 'Zipping…';
+    try {
+      const zip = new JSZip();
+      for (const n of notes) { const r = await fetch(n.url); if (!r.ok) throw new Error('Could not fetch ' + n.file_name + '. Click Refresh and try again.'); zip.file(n.file_name, await r.arrayBuffer()); }
+      zip.file('yearbook-notes-details.csv', '﻿' + csvText());
+      save(await zip.generateAsync({ type: 'blob' }), 'yearbook-notes.zip');
+    } catch (e) { $('status').textContent = e.message; }
+    btn.disabled = false; btn.textContent = 'Download all PNGs';
+  });
+  if (pass) load().catch(() => { pass = ''; });
+})();
+</script>
+</body>
+</html>

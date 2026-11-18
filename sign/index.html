@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign My Yearbook!</title>
+<meta name="description" content="Leave a handwritten note for the Class of 2026 yearbook, Bi-Annual Child & Adolescent Mixer.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://becoded126.github.io/mixer-frames/sign/">
+<meta property="og:title" content="Sign My Yearbook!">
+<meta property="og:description" content="Leave a note for the Class of 2026. Bi-Annual Child &amp; Adolescent Mixer, December 3.">
+<meta property="og:image" content="https://becoded126.github.io/mixer-frames/share-preview.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Oswald:wght@500;600;700&family=Montserrat:wght@500;600;800&display=swap">
+<style>
+:root{--paper:#EDEEF0;--card:#FFFFFF;--ink:#0E1A30;--muted:#4A5263;--mint:#35D9B4;--mint-ink:#0F8F78;--mag:#E8279A;--yel:#F5C02E;--pur:#7B3FD6;--line:#D4D8E0;--rule:#B9D3F0;
+--display:'Permanent Marker','Marker Felt',cursive;--label:'Oswald','Arial Narrow',Arial,sans-serif;--body:'Montserrat','Helvetica Neue',Arial,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%;overflow-x:hidden}
+.dab{position:fixed;border-radius:50%;z-index:0;pointer-events:none}
+.dab.a{width:220px;height:220px;background:var(--mint);top:-110px;left:-90px}
+.dab.b{width:170px;height:170px;background:var(--mag);top:70px;right:-110px}
+.dab.c{width:190px;height:190px;background:var(--yel);bottom:-150px;left:-130px}
+.dab.d{width:210px;height:210px;background:var(--pur);bottom:-160px;right:-150px}
+.wrap{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(40px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.kicker{font-family:var(--label);font-weight:600;letter-spacing:.22em;font-size:12px;text-transform:uppercase}
+h1.patch{margin:0;font-weight:400;background:var(--ink);color:#fff;font-family:var(--display);font-size:clamp(34px,10.5vw,58px);line-height:1.05;padding:16px 26px 20px;transform:rotate(-1.5deg);clip-path:polygon(1% 4%,30% 0,62% 3%,99% 0,100% 46%,98% 100%,66% 97%,33% 100%,0 97%,2% 52%)}
+h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(--yel);border-radius:4px}
+.sub{margin:0;max-width:100%;font-family:var(--display);font-size:clamp(15px,4.5vw,23px);line-height:1.2;color:var(--mag);transform:rotate(-1deg)}
+.card{background:var(--card);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.card h2{margin:0;font-family:var(--label);font-weight:700;font-size:17px;letter-spacing:.12em;text-transform:uppercase}
+.card p{margin:0}
+.muted{color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.lbl{font-family:var(--label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:13px}
+.field input{font:600 16px var(--body);padding:12px;border:2px solid var(--line);border-radius:10px;color:var(--ink);background:#fff;width:100%}
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--label);font-weight:700;font-size:15px;letter-spacing:.14em;text-transform:uppercase;padding:12px 20px;border-radius:6px;color:var(--ink);background:var(--mint);min-height:46px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.ghost{background:transparent;border:2px solid var(--line);font-size:13px;padding:8px 12px;min-height:44px;letter-spacing:.1em}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.link{appearance:none;background:none;border:0;padding:10px 4px;font:600 14px var(--body);color:var(--muted);text-decoration:underline;cursor:pointer;min-height:44px}
+.btn:focus-visible,.link:focus-visible,input:focus-visible,.pen:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.row.split{justify-content:space-between}
+.err{color:#B3261E;font-size:14px;font-weight:600}
+
+/* notebook paper: the paper is CSS only, so the saved note is handwriting alone */
+.sheet{position:relative;width:100%;aspect-ratio:5/3;border-radius:6px;background-color:#fff;
+  background-image:linear-gradient(90deg,transparent 0,transparent calc(9% - 1px),rgba(232,39,154,.55) calc(9% - 1px),rgba(232,39,154,.55) calc(9% + 1px),transparent calc(9% + 1px)),
+  repeating-linear-gradient(180deg,transparent 0,transparent calc(20% - 2px),var(--rule) calc(20% - 2px),var(--rule) 20%);
+  box-shadow:0 1px 0 #cfd4dc,0 10px 22px rgba(14,26,48,.16);overflow:hidden}
+.sheet .hole{position:absolute;left:3%;width:3%;aspect-ratio:1;border-radius:50%;background:var(--paper);box-shadow:inset 0 1px 2px rgba(14,26,48,.25);pointer-events:none}
+.sheet .hole.h1{top:14%}.sheet .hole.h2{top:47%}.sheet .hole.h3{top:80%}
+.sheet canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.sheet .ghost-hint{position:absolute;left:14%;right:6%;top:34%;font-family:var(--display);font-size:clamp(15px,4.6vw,24px);color:#B7BECB;pointer-events:none;text-align:center;line-height:1.2}
+.pens{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.pen{appearance:none;width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--line);background:var(--c);cursor:pointer;padding:0}
+.pen[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink);transform:scale(1.08)}
+.penname{font-size:14px;color:var(--muted);font-weight:600}
+.tools{display:flex;gap:8px}
+
+.printwrap{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--paper);border-radius:14px;padding:16px}
+.print{width:2in;height:1.2in;background:#fff;border:1px dashed #9AA3B2;position:relative}
+.print canvas{width:100%;height:100%;display:block}
+.sig{font:800 13px var(--body)}
+.sig span{display:block;font-weight:600;color:var(--muted);font-size:12px}
+.consent{font-size:13.5px;font-weight:600;background:#FFF7DB;border-left:5px solid var(--yel);padding:10px 12px;border-radius:4px}
+.thanks{align-items:center;text-align:center;padding:26px 18px}
+.thanks .big{font-family:var(--display);font-size:clamp(34px,10vw,50px);line-height:1.05;color:var(--ink)}
+.thanks .big em{font-style:normal;color:var(--mint-ink)}
+footer{font-size:12.5px;color:var(--muted);text-align:center}
+@media (min-width:700px){.card{padding:24px}}
+</style>
+</head>
+<body>
+<i class="dab a"></i><i class="dab b"></i><i class="dab c"></i><i class="dab d"></i>
+<div class="wrap">
+  <header>
+    <div class="kicker">Bi-Annual Child &amp; Adolescent Mixer</div>
+    <h1 class="patch">Sign My Yearbook!<i class="u"></i></h1>
+    <p class="sub">Leave a note for the Class of 2026.</p>
+  </header>
+
+  <!-- 1: who -->
+  <form class="card" id="s-who" novalidate>
+    <h2>First, who’s signing?</h2>
+    <div class="field"><label for="name">Full name</label><input id="name" autocomplete="name" autocapitalize="words" maxlength="80" placeholder="First and last name"></div>
+    <div class="field"><label for="org">Organization</label><input id="org" autocomplete="organization" autocapitalize="words" maxlength="100" placeholder="Where you work"></div>
+    <p class="err" id="whoErr" role="alert" hidden></p>
+    <button class="btn wide" type="submit">Next: write your note</button>
+    <p class="muted">Takes about a minute. Your note will be printed in the Class of 2026 yearbook.</p>
+  </form>
+
+  <!-- 2: write -->
+  <section class="card" id="s-write" hidden>
+    <div class="row split">
+      <h2>Write your note and sign it</h2>
+    </div>
+    <p class="muted">Use your finger, a stylus or your mouse. Keep it short and write big: this box prints 2 inches wide in the book.</p>
+    <div class="sheet" id="sheet">
+      <i class="hole h1"></i><i class="hole h2"></i><i class="hole h3"></i>
+      <div class="ghost-hint" id="ghost">Write here</div>
+      <canvas id="pad" aria-label="Writing box for your handwritten note"></canvas>
+    </div>
+    <div class="row split">
+      <div>
+        <div class="lbl" id="penLbl">Pen color</div>
+        <div class="pens" role="group" aria-labelledby="penLbl" id="pens"></div>
+      </div>
+      <div class="tools">
+        <button type="button" class="btn ghost" id="undo" disabled>Undo</button>
+        <button type="button" class="btn ghost" id="clear" disabled>Clear</button>
+      </div>
+    </div>
+    <p class="err" id="writeErr" role="alert" hidden></p>
+    <button type="button" class="btn wide" id="toPreview">Preview my note</button>
+    <div class="row split"><button type="button" class="link" id="backWho">Edit name</button><button type="button" class="link" data-startover>Start over</button></div>
+  </section>
+
+  <!-- 3: preview -->
+  <section class="card" id="s-preview" hidden>
+    <h2>Here’s how it will print</h2>
+    <div class="printwrap">
+      <div class="print"><canvas id="printCv" width="600" height="360" aria-label="Your note at about printed size"></canvas></div>
+      <div class="muted" style="font-size:12.5px">About the printed size: 2 inches wide</div>
+      <div class="sig" id="sig"></div>
+    </div>
+    <p class="consent">By tapping Send, you agree that your handwritten note and name will be printed in the Class of 2026 yearbook.</p>
+    <p class="err" id="sendErr" role="alert" hidden></p>
+    <button type="button" class="btn wide" id="send">Send my note</button>
+    <div class="row split"><button type="button" class="link" id="backWrite">Keep writing</button><button type="button" class="link" data-startover>Start over</button></div>
+  </section>
+
+  <!-- 4: thanks -->
+  <section class="card thanks" id="s-thanks" hidden>
+    <div class="big">Thank you, <em id="thanksName"></em>!</div>
+    <p>Your note is in. It will be printed on the Sign My Yearbook pages of the Class of 2026 yearbook.</p>
+    <p class="muted">See you Thursday, December 3, at the Bi-Annual Child &amp; Adolescent Mixer.</p>
+  </section>
+
+  <footer>Bi-Annual Child &amp; Adolescent Mixer, Thursday, December 3, 2026. Hosted by Fort Lauderdale Behavioral Health Center with Discovery Behavioral Health.</footer>
+</div>
+
+<script>
+(() => {
+  const API = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/yearbook';
+  const W = 1800, H = 1080;      // saved PNG: 2 x 1.2 in at 900 DPI-equivalent headroom (300 DPI needs 600 x 360)
+  const PEN = 20;                // line width in saved pixels: about 0.022 in (0.56 mm) in print, like a bold felt tip
+  const COLORS = [
+    ['blue', '#1F5FE0', 'Blue'], ['magenta', '#E8279A', 'Magenta'], ['teal', '#0FA58A', 'Teal'],
+    ['purple', '#7B3FD6', 'Purple'], ['orange-red', '#F04A23', 'Orange-red'], ['navy', '#0E1A30', 'Navy'],
+  ];
+  const $ = (id) => document.getElementById(id);
+  const screens = { who: $('s-who'), write: $('s-write'), preview: $('s-preview'), thanks: $('s-thanks') };
+  const pad = $('pad'), sheet = $('sheet'), g = pad.getContext('2d');
+  let strokes = [], cur = null, color = COLORS[0], sending = false;
+
+  function show(name) {
+    Object.entries(screens).forEach(([k, el]) => { el.hidden = k !== name; });
+    if (name === 'write') requestAnimationFrame(fit);
+    window.scrollTo(0, 0);
+  }
+  function setErr(el, msg) { el.textContent = msg || ''; el.hidden = !msg; }
+
+  // ---- drawing: strokes are stored in saved-PNG coordinates so the export is exact
+  function paint(ctx, k, hex) {
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = hex; ctx.fillStyle = hex; ctx.lineWidth = PEN * k;
+    for (const s of strokes) {
+      const p = s.pts;
+      if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0] * k, p[0][1] * k, PEN * k / 2, 0, Math.PI * 2); ctx.fill(); continue; }
+      ctx.beginPath(); ctx.moveTo(p[0][0] * k, p[0][1] * k);
+      for (let i = 1; i < p.length - 1; i++) {
+        const mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2;
+        ctx.quadraticCurveTo(p[i][0] * k, p[i][1] * k, mx * k, my * k);
+      }
+      const l = p[p.length - 1]; ctx.lineTo(l[0] * k, l[1] * k); ctx.stroke();
+    }
+  }
+  function redraw() {
+    g.clearRect(0, 0, pad.width, pad.height);
+    paint(g, pad.width / W, color[1]);
+    const has = strokes.length > 0;
+    $('ghost').hidden = has; $('undo').disabled = !has; $('clear').disabled = !has;
+  }
+  function fit() {
+    const r = sheet.getBoundingClientRect(); if (!r.width) return;
+    const dpr = Math.min(3, window.devicePixelRatio || 1);
+    const w = Math.round(r.width * dpr), h = Math.round(r.width * dpr * 3 / 5);
+    if (pad.width !== w || pad.height !== h) { pad.width = w; pad.height = h; }
+    redraw();
+  }
+  function pt(e) {
+    const r = pad.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+    return [Math.round(Math.max(PEN / 2, Math.min(W - PEN / 2, x)) * 10) / 10, Math.round(Math.max(PEN / 2, Math.min(H - PEN / 2, y)) * 10) / 10];
+  }
+  pad.addEventListener('pointerdown', (e) => {
+    if (e.button > 0) return;
+    e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch (x) {}
+    cur = { id: e.pointerId, pts: [pt(e)] }; strokes.push(cur); setErr($('writeErr')); redraw();
+  });
+  pad.addEventListener('pointermove', (e) => {
+    if (!cur || e.pointerId !== cur.id) return;
+    e.preventDefault();
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    for (const ev of (evs.length ? evs : [e])) {
+      const p = pt(ev), l = cur.pts[cur.pts.length - 1];
+      if (Math.hypot(p[0] - l[0], p[1] - l[1]) >= 4) cur.pts.push(p);
+    }
+    redraw();
+  });
+  const end = (e) => { if (cur && e.pointerId === cur.id) cur = null; };
+  pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
+  pad.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  window.addEventListener('resize', fit);
+
+  // ---- pens
+  COLORS.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'pen'; b.style.setProperty('--c', c[1]); b.setAttribute('aria-label', c[2] + ' pen'); b.setAttribute('aria-pressed', i === 0); b.title = c[2];
+    b.addEventListener('click', () => { color = c; document.querySelectorAll('.pen').forEach((x) => x.setAttribute('aria-pressed', x === b)); redraw(); });
+    $('pens').append(b);
+  });
+  $('undo').addEventListener('click', () => { strokes.pop(); redraw(); });
+  $('clear').addEventListener('click', () => { strokes = []; redraw(); });
+
+  // ---- steps
+  const nameIn = $('name'), orgIn = $('org');
+  const tidy = (s) => s.replace(/\s+/g, ' ').trim();
+  screens.who.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const n = tidy(nameIn.value), o = tidy(orgIn.value);
+    if (n.split(' ').length < 2) { setErr($('whoErr'), 'Add your first and last name.'); nameIn.focus(); return; }
+    if (!o) { setErr($('whoErr'), 'Add your organization.'); orgIn.focus(); return; }
+    nameIn.value = n; orgIn.value = o; setErr($('whoErr')); show('write');
+  });
+  $('backWho').addEventListener('click', () => show('who'));
+  $('backWrite').addEventListener('click', () => show('write'));
+  $('toPreview').addEventListener('click', () => {
+    const ink = strokes.reduce((a, s) => a + s.pts.length, 0);
+    if (ink < 12) { setErr($('writeErr'), 'Write your note and signature in the box first.'); return; }
+    const pc = $('printCv'), pg = pc.getContext('2d');
+    pg.clearRect(0, 0, pc.width, pc.height); paint(pg, pc.width / W, color[1]);
+    $('sig').replaceChildren(document.createTextNode(nameIn.value), Object.assign(document.createElement('span'), { textContent: orgIn.value }));
+    setErr($('sendErr')); show('preview');
+  });
+  function exportPng() {
+    const c = document.createElement('canvas'); c.width = W; c.height = H;   // transparent: handwriting only
+    paint(c.getContext('2d'), 1, color[1]);
+    return c.toDataURL('image/png');
+  }
+  window.__yearbookExport = exportPng;
+  $('send').addEventListener('click', async () => {
+    if (sending) return;
+    sending = true; const btn = $('send'); btn.disabled = true; btn.textContent = 'Sending…'; setErr($('sendErr'));
+    try {
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], png: exportPng(), consent: true }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.message || 'Your note didn’t send. Check your connection and tap Send again.');
+      $('thanksName').textContent = nameIn.value.split(' ')[0];
+      strokes = []; show('thanks');
+    } catch (err) {
+      setErr($('sendErr'), /fetch|load/i.test(err.message) ? 'Your note didn’t send. Check your connection and tap Send again.' : err.message);
+    }
+    sending = false; btn.disabled = false; btn.textContent = 'Send my note';
+  });
+  document.querySelectorAll('[data-startover]').forEach((b) => {
+    let armed = null;
+    b.addEventListener('click', () => {
+      if (!armed) { b.textContent = 'Tap again to erase everything'; armed = setTimeout(() => { b.textContent = 'Start over'; armed = null; }, 4000); return; }
+      clearTimeout(armed); armed = null; b.textContent = 'Start over';
+      strokes = []; nameIn.value = ''; orgIn.value = ''; redraw(); show('who');
+    });
+  });
+})();
+</script>
+</body>
+</html>
