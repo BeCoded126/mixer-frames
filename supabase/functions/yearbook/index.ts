@@ -3,9 +3,9 @@
 //   -> saves a transparent 1800x1080 PNG to the private "yearbook-notes" bucket and a row in yearbook_notes.
 // POST JSON { action: "read", image (JPEG data URL of a handwritten word or two), context } -> { text }: reads the handwriting
 //   with OpenAI so the page can redraw it in a handwriting font. The image is not stored.
-// POST JSON { action: "list", pass }            -> all notes with short-lived signed image links (admin).
+// POST JSON { action: "list" }                  -> all notes with short-lived signed image links (no passcode, by request).
 // POST JSON { action: "remove", pass, id }      -> deletes one note (admin).
-// Nothing in the bucket or table is readable without this function.
+// The bucket stays private and unlisted; notes are only reachable through this function.
 
 const BUCKET = "yearbook-notes";
 const W = 1800, H = 1080;
@@ -149,9 +149,10 @@ Deno.serve(async (req) => {
   try {
     if (body.action === "submit") return await submit(body);
     if (body.action === "read") return await read(body);
-    if (body.action === "list" || body.action === "remove") {
+    if (body.action === "list") return await list();
+    if (body.action === "remove") {
       if (!(await isAdmin(body.pass))) return reply(401, { error: "pass", message: "That passcode isn't right." });
-      return body.action === "list" ? await list() : await remove(body.id);
+      return await remove(body.id);
     }
     return reply(400, { error: "action" });
   } catch (e) {

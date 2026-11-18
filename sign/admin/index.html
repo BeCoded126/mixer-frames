@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yearbook notes: admin</title>
+<title>Yearbook notes</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,14 +38,14 @@ code{font-size:12.5px;word-break:break-all}
 <div class="wrap">
   <h1>Yearbook notes</h1>
 
-  <form class="card" id="gate">
-    <label for="pass">Admin passcode</label>
+  <form class="card" id="gate" hidden>
+    <label for="pass">Passcode to remove a note</label>
     <input id="pass" type="password" autocomplete="current-password">
-    <div class="row"><button class="btn dark" type="submit">Open</button><span class="err" id="gateErr" role="alert"></span></div>
-    <p class="muted">Private page for the Sign My Yearbook notes. Nothing loads without the passcode.</p>
+    <div class="row"><button class="btn dark" type="submit">Save passcode</button><span class="err" id="gateErr" role="alert"></span></div>
+    <p class="muted">Only needed to delete a note. Enter it once, then click Remove again.</p>
   </form>
 
-  <div id="main" hidden>
+  <div id="main">
     <div class="card">
       <div class="row" style="justify-content:space-between">
         <div class="count" id="count"></div>
@@ -101,20 +101,23 @@ code{font-size:12.5px;word-break:break-all}
       dl.addEventListener('click', async () => { const r = await fetch(n.url); save(await r.blob(), n.file_name); });
       const rm = document.createElement('button'); rm.className = 'btn ghost'; rm.type = 'button'; rm.textContent = 'Remove'; let armed = null;
       rm.addEventListener('click', async () => {
+        if (!pass) { $('gate').hidden = false; $('pass').focus(); return; }
         if (!armed) { rm.textContent = 'Click again to delete'; armed = setTimeout(() => { rm.textContent = 'Remove'; armed = null; }, 4000); return; }
         clearTimeout(armed); rm.disabled = true;
-        try { await call({ action: 'remove', id: n.id }); await load(); } catch (e) { $('status').textContent = e.message; rm.disabled = false; }
+        try { await call({ action: 'remove', id: n.id }); await load(); }
+        catch (e) { $('status').textContent = e.message; rm.disabled = false; rm.textContent = 'Remove'; armed = null; if (e.status === 401) { pass = ''; $('gate').hidden = false; } }
       });
       row.append(dl, rm); card.append(sheet, who, meta, row); grid.append(card);
     });
   }
   async function load() {
     const data = await call({ action: 'list' });
-    notes = data.notes || []; $('gate').hidden = true; $('main').hidden = false; render();
+    notes = data.notes || []; render();
   }
-  $('gate').addEventListener('submit', async (e) => {
-    e.preventDefault(); pass = $('pass').value.trim(); $('gateErr').textContent = '';
-    try { await load(); try { sessionStorage.setItem('ybPass', pass); } catch (x) {} } catch (err) { $('gateErr').textContent = err.status === 401 ? 'That passcode isn’t right.' : err.message; }
+  $('gate').addEventListener('submit', (e) => {
+    e.preventDefault(); pass = $('pass').value.trim(); if (!pass) return;
+    try { sessionStorage.setItem('ybPass', pass); } catch (x) {}
+    $('gate').hidden = true; $('status').textContent = 'Passcode saved. Click Remove again on the note you want to delete.';
   });
   $('refresh').addEventListener('click', () => load().catch((e) => { $('status').textContent = e.message; }));
   $('csv').addEventListener('click', () => save(new Blob(['﻿' + csvText()], { type: 'text/csv' }), 'yearbook-notes-details.csv'));
@@ -128,7 +131,7 @@ code{font-size:12.5px;word-break:break-all}
     } catch (e) { $('status').textContent = e.message; }
     btn.disabled = false; btn.textContent = 'Download all PNGs';
   });
-  if (pass) load().catch(() => { pass = ''; });
+  load().catch((e) => { $('status').textContent = e.message; });
 })();
 </script>
 </body>
