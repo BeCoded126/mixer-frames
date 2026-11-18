@@ -54,16 +54,11 @@ h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(
 @media (max-width:360px){.choose{grid-template-columns:1fr}}
 #typeUi{display:flex;flex-direction:column;gap:6px}
 
-/* notebook paper: the paper is CSS only, so the saved note is the writing alone */
-.sheet{position:relative;width:100%;aspect-ratio:5/3;border-radius:6px;background-color:#fff;flex:none;
-  background-image:linear-gradient(90deg,transparent 0,transparent calc(9% - 1px),rgba(232,39,154,.55) calc(9% - 1px),rgba(232,39,154,.55) calc(9% + 1px),transparent calc(9% + 1px)),
-  repeating-linear-gradient(180deg,transparent 0,transparent calc(20% - 2px),var(--rule) calc(20% - 2px),var(--rule) 20%);
-  box-shadow:0 1px 0 #cfd4dc,0 10px 22px rgba(14,26,48,.16);overflow:hidden}
-.sheet .hole{position:absolute;left:3%;width:3%;aspect-ratio:1;border-radius:50%;background:var(--paper);box-shadow:inset 0 1px 2px rgba(14,26,48,.25);pointer-events:none}
-.sheet .hole.h1{top:14%}.sheet .hole.h2{top:47%}.sheet .hole.h3{top:80%}
+/* the page is CSS only, so the saved note is the writing alone */
+.sheet{position:relative;width:100%;aspect-ratio:5/3;border-radius:6px;background:#fff;flex:none;box-shadow:0 1px 0 #cfd4dc,0 10px 22px rgba(14,26,48,.16);overflow:hidden}
 .sheet canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
 .typing .sheet canvas{pointer-events:none;touch-action:auto;cursor:default}
-.sheet .ghost-hint{position:absolute;left:14%;right:6%;top:36%;font-family:var(--display);font-size:clamp(16px,4.6vw,34px);color:#B7BECB;pointer-events:none;text-align:center;line-height:1.2}
+.sheet .ghost-hint{position:absolute;left:8%;right:8%;top:38%;font-family:var(--display);font-size:clamp(16px,4.6vw,34px);color:#B7BECB;pointer-events:none;text-align:center;line-height:1.2}
 .side{display:flex;flex-direction:column;gap:14px}
 .pens{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 .pen{appearance:none;width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--line);background:var(--c);cursor:pointer;padding:0}
@@ -75,33 +70,37 @@ h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(
 .font[aria-pressed="true"]{border-color:var(--mint-ink);box-shadow:inset 0 -4px 0 var(--mint)}
 .count{font-size:12.5px;color:var(--muted);text-align:right}
 
-/* writing by hand gets a much bigger page */
-body.writing .wrap{max-width:940px}
-@media (max-width:700px){
-  body.writing .wrap{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}
-  body.writing #s-write{padding:14px 10px}
-}
-/* phone turned sideways: the page fills the screen, tools sit beside it */
-body.land header,body.land footer,body.land .dab,body.land .whead,body.land .links,body.land #penLbl{display:none}
-body.land{overflow:hidden}
-body.land #s-write{position:fixed;inset:0;z-index:5;border-radius:0;background:var(--paper);flex-direction:row;align-items:center;justify-content:center;gap:10px;
-  padding:8px max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left))}
-body.land .side{width:112px;flex:none;gap:8px}
-body.land .pens{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;justify-items:center}
-body.land .pen{width:32px;height:32px}
-body.land .tools{flex-direction:column;gap:6px}
-body.land .btn.ghost{min-height:38px;width:100%}
-body.land #toPreview{padding:10px 6px;font-size:14px;letter-spacing:.1em}
-body.land .side .err{font-size:12px}
+.ghost-hint span{display:none}
+.typing .ghost-hint .h-type{display:inline}
+.stage .ghost-hint .h-land{display:inline}
 
-.turn{position:fixed;inset:0;z-index:20;background:rgba(14,26,48,.94);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;text-align:center}
-.turn b{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;color:var(--mint)}
-.turn p{margin:0;max-width:30ch}
-.turn .phone{width:64px;height:112px;border:5px solid #fff;border-radius:14px;position:relative;animation:tip 2.4s ease-in-out infinite}
-.turn .phone::after{content:"";position:absolute;left:50%;bottom:6px;width:18px;height:4px;margin-left:-9px;border-radius:2px;background:#fff}
-@keyframes tip{0%,25%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
-@media (prefers-reduced-motion:reduce){.turn .phone{animation:none;transform:rotate(-90deg)}}
-.turn .link{color:#fff}
+/* writing by hand: a blank page that fills the whole screen, tools in a slim column beside it */
+body.staging{overflow:hidden}
+#s-write.stage{position:fixed;inset:0;z-index:5;border-radius:0;background:#fff;flex-direction:row;align-items:center;justify-content:center;gap:12px;
+  padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  container-type:size;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.stage .whead,.stage #penLbl{display:none}
+.stage .sheet{width:min(calc(100vw - 150px),calc((100vh - 16px) * 5 / 3));border-radius:0;box-shadow:none;outline:2px dashed var(--line);outline-offset:-1px}
+.stage .ghost-hint{font-size:clamp(18px,5cqh,40px)}
+.stage .side{width:112px;flex:none;gap:6px}
+.stage .pens{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;justify-items:center}
+.stage .pen{width:30px;height:30px}
+.stage .tools{flex-direction:column;gap:6px}
+.stage .btn{touch-action:manipulation}
+.stage .btn.ghost{min-height:34px;width:100%;padding:4px 8px}
+.stage #toPreview{min-height:42px;padding:8px 6px;font-size:14px;letter-spacing:.1em}
+.stage .side .err{font-size:12px;line-height:1.3}
+.stage .links{flex-direction:column;align-items:stretch;gap:0}
+.stage .links .link{font-size:12px;min-height:30px;padding:4px 2px;text-align:center;touch-action:manipulation}
+/* phone held upright: the page is drawn sideways so turning the phone gives the big page, with or without rotation lock */
+@media (orientation:portrait) and (max-width:700px){
+  #s-write.stage{inset:auto;top:0;left:0;width:100vh;width:100dvh;height:100vw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%);
+    padding:max(6px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left)) max(8px,env(safe-area-inset-top))}
+  .stage .sheet{width:min(calc(100vh - 150px),calc((100vw - 16px) * 5 / 3))}
+  .stage .ghost-hint .h-land{display:none}
+  .stage .ghost-hint .h-port{display:inline}
+}
+@supports (width:1cqw){.stage .sheet{width:min(calc(100cqw - 124px),calc(100cqh * 5 / 3))}}
 
 .printwrap{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--paper);border-radius:14px;padding:16px}
 .print{width:2in;height:1.2in;background:#fff;border:1px dashed #9AA3B2;position:relative}
@@ -155,8 +154,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
       <div class="fonts" role="group" aria-labelledby="fontLbl" id="fonts"></div>
     </div>
     <div class="sheet" id="sheet">
-      <i class="hole h1"></i><i class="hole h2"></i><i class="hole h3"></i>
-      <div class="ghost-hint" id="ghost">Write here</div>
+      <div class="ghost-hint" id="ghost"><span class="h-land">Write here</span><span class="h-port">Turn your phone sideways and write here</span><span class="h-type">Your note shows up here</span></div>
       <canvas id="pad" aria-label="Your note"></canvas>
     </div>
     <div class="side">
@@ -198,13 +196,6 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   <footer>Bi-Annual Child &amp; Adolescent Mixer, Thursday, December 3, 2026. Hosted by Fort Lauderdale Behavioral Health Center with Discovery Behavioral Health.</footer>
 </div>
 
-<div class="turn" id="turn" hidden role="dialog" aria-label="Turn your phone sideways">
-  <div class="phone" aria-hidden="true"></div>
-  <b>Turn your phone sideways</b>
-  <p>You’ll get a much bigger page to write on. If the screen doesn’t turn, switch off rotation lock.</p>
-  <button type="button" class="link" id="turnSkip">Write this way instead</button>
-</div>
-
 <script>
 (() => {
   const API = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/yearbook';
@@ -224,9 +215,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   const screens = { who: $('s-who'), write: $('s-write'), preview: $('s-preview'), thanks: $('s-thanks') };
   const pad = $('pad'), sheet = $('sheet'), g = pad.getContext('2d');
   const nameIn = $('name'), orgIn = $('org'), noteIn = $('noteText');
-  const landMq = window.matchMedia('(orientation: landscape) and (max-height: 560px)');
-  const portraitMq = window.matchMedia('(orientation: portrait) and (max-width: 700px) and (pointer: coarse)');
-  let strokes = [], cur = null, color = COLORS[0], font = FONTS[0], mode = 'draw', screen = 'who', sending = false, turnSkipped = false;
+  let strokes = [], cur = null, color = COLORS[0], font = FONTS[0], mode = 'draw', screen = 'who', sending = false, rotated = false;
 
   const tidy = (s) => s.replace(/\s+/g, ' ').trim();
   function setErr(el, msg) { el.textContent = msg || ''; el.hidden = !msg; }
@@ -246,21 +235,14 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     $('swap').textContent = typing ? 'Write it by hand instead' : 'Type it instead';
     setErr($('writeErr')); layout();
   }
-  // decides the big-page layout and the turn-your-phone prompt
+  // handwriting takes over the whole screen; all sizing is CSS, so a late or missing rotation event can't shrink the page
   function layout() {
     const drawing = screen === 'write' && mode === 'draw';
-    const land = drawing && landMq.matches;
-    document.body.classList.toggle('writing', drawing);
-    document.body.classList.toggle('land', land);
-    $('turn').hidden = !(drawing && portraitMq.matches && !turnSkipped);
-    if (land) {
-      const cs = getComputedStyle(screens.write);
-      const cw = screens.write.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 112 - 10;
-      const ch = screens.write.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-      sheet.style.width = Math.floor(Math.min(cw, ch * 5 / 3)) + 'px';
-    } else sheet.style.width = '';
+    screens.write.classList.toggle('stage', drawing);
+    document.body.classList.toggle('staging', drawing);
     if (screen === 'write') requestAnimationFrame(fit);
   }
+  const isRotated = () => { const t = getComputedStyle(screens.write).transform; return !!t && t !== 'none'; };
 
   // ---- the note. Handwriting is stored in saved-PNG coordinates so the export is exact.
   function paintStrokes(ctx, k, hex) {
@@ -281,7 +263,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   function typedLayout(ctx) {
     const text = noteIn.value.replace(/[ \t]+/g, ' ').trim();
     if (!text) return null;
-    const x0 = 215, x1 = W - 75, y0 = 55, y1 = H - 55, maxW = x1 - x0, maxH = y1 - y0, LH = 1.18;
+    const x0 = 90, x1 = W - 90, y0 = 55, y1 = H - 55, maxW = x1 - x0, maxH = y1 - y0, LH = 1.18;
     const sign = '– ' + nameIn.value.split(' ')[0];
     const setFont = (px) => { ctx.font = `${font[1]} ${px * font[3]}px "${font[0]}", cursive`; };
     for (let size = MAX_SIZE; size >= MIN_SIZE; size -= 6) {
@@ -317,28 +299,28 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   function redraw() {
     g.clearRect(0, 0, pad.width, pad.height);
     const res = paintNote(g, pad.width / W);
-    if (mode === 'type') {
-      $('ghost').textContent = 'Your note shows up here'; $('ghost').hidden = !!noteIn.value.trim();
-      setErr($('writeErr'), res === false ? TOO_LONG : '');
-    } else { $('ghost').textContent = 'Write here'; $('ghost').hidden = strokes.length > 0; }
+    if (mode === 'type') { $('ghost').hidden = !!noteIn.value.trim(); setErr($('writeErr'), res === false ? TOO_LONG : ''); }
+    else $('ghost').hidden = strokes.length > 0;
     $('undo').disabled = $('clear').disabled = !strokes.length;
   }
   function fit() {
-    const r = sheet.getBoundingClientRect(); if (!r.width) return;
+    const cw = sheet.clientWidth; if (!cw) return;   // layout width: not affected by the sideways transform
     const dpr = Math.min(3, window.devicePixelRatio || 1);
-    const w = Math.round(r.width * dpr), h = Math.round(r.width * dpr * 3 / 5);
+    const w = Math.round(cw * dpr), h = Math.round(cw * dpr * 3 / 5);
     if (pad.width !== w || pad.height !== h) { pad.width = w; pad.height = h; }
     redraw();
   }
   function pt(e) {
     const r = pad.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+    // when the page is drawn sideways, its x axis runs down the screen and its y axis runs right to left
+    const x = rotated ? (e.clientY - r.top) / r.height * W : (e.clientX - r.left) / r.width * W;
+    const y = rotated ? (r.right - e.clientX) / r.width * H : (e.clientY - r.top) / r.height * H;
     return [Math.round(Math.max(PEN / 2, Math.min(W - PEN / 2, x)) * 10) / 10, Math.round(Math.max(PEN / 2, Math.min(H - PEN / 2, y)) * 10) / 10];
   }
   pad.addEventListener('pointerdown', (e) => {
     if (mode !== 'draw' || e.button > 0) return;
     e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch (x) {}
-    cur = { id: e.pointerId, pts: [pt(e)] }; strokes.push(cur); setErr($('writeErr')); redraw();
+    rotated = isRotated(); cur = { id: e.pointerId, pts: [pt(e)] }; strokes.push(cur); setErr($('writeErr')); redraw();
   });
   pad.addEventListener('pointermove', (e) => {
     if (!cur || e.pointerId !== cur.id) return;
@@ -353,9 +335,9 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   const end = (e) => { if (cur && e.pointerId === cur.id) cur = null; };
   pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
   pad.addEventListener('touchstart', (e) => { if (mode === 'draw') e.preventDefault(); }, { passive: false });
-  window.addEventListener('resize', layout);
-  window.addEventListener('orientationchange', () => setTimeout(layout, 250));
-  $('turnSkip').addEventListener('click', () => { turnSkipped = true; layout(); });
+  if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(sheet);
+  const refit = () => [0, 150, 400, 900].forEach((ms) => setTimeout(fit, ms));
+  window.addEventListener('resize', refit); window.addEventListener('orientationchange', refit);
 
   // ---- pens and handwriting styles
   COLORS.forEach((c, i) => {
@@ -424,7 +406,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     b.addEventListener('click', () => {
       if (!armed) { b.textContent = 'Tap again to erase everything'; armed = setTimeout(() => { b.textContent = 'Start over'; armed = null; }, 4000); return; }
       clearTimeout(armed); armed = null; b.textContent = 'Start over';
-      strokes = []; nameIn.value = ''; orgIn.value = ''; noteIn.value = ''; $('count').textContent = '0 / 120'; turnSkipped = false; redraw(); show('who');
+      strokes = []; nameIn.value = ''; orgIn.value = ''; noteIn.value = ''; $('count').textContent = '0 / 120'; redraw(); show('who');
     });
   });
 })();
