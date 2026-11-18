@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://becoded126.github.io/mixer-frames/share-preview.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Oswald:wght@500;600;700&family=Montserrat:wght@500;600;800&family=Caveat:wght@700&family=Patrick+Hand&family=Indie+Flower&family=Covered+By+Your+Grace&family=Satisfy&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Oswald:wght@500;600;700&family=Montserrat:wght@500;600;800&family=Caveat:wght@700&family=Patrick+Hand&family=Indie+Flower&family=Covered+By+Your+Grace&family=Satisfy&family=Architects+Daughter&family=Shadows+Into+Light&display=swap">
 <style>
 :root{--paper:#EDEEF0;--card:#FFFFFF;--ink:#0E1A30;--muted:#4A5263;--mint:#35D9B4;--mint-ink:#0F8F78;--mag:#E8279A;--yel:#F5C02E;--pur:#7B3FD6;--line:#D4D8E0;--rule:#B9D3F0;
 --display:'Permanent Marker','Marker Felt',cursive;--label:'Oswald','Arial Narrow',Arial,sans-serif;--body:'Montserrat','Helvetica Neue',Arial,sans-serif;color-scheme:light}
@@ -68,13 +68,13 @@ h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(
 .thick{appearance:none;width:44px;height:44px;border-radius:10px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
 .thick i{display:block;width:var(--d);height:var(--d);border-radius:50%;background:var(--ink)}
 .thick[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -4px 0 var(--mint)}
-.fonts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:2px}
-@media (max-width:520px){.fonts{grid-template-columns:repeat(3,1fr)}}
+.fonts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:2px}
+@media (max-width:520px){.fonts{grid-template-columns:repeat(2,1fr)}}
 .font{appearance:none;border:2px solid var(--line);background:#fff;border-radius:10px;min-height:48px;padding:4px 6px;font-size:22px;line-height:1.1;color:var(--ink);cursor:pointer}
 .font[aria-pressed="true"]{border-color:var(--mint-ink);box-shadow:inset 0 -4px 0 var(--mint)}
 .count{font-size:12.5px;color:var(--muted);text-align:right}
-#fontCycle,#snapToggle{display:none}
-.stage #fontCycle{display:block;width:100%;min-height:36px;font-size:20px;touch-action:manipulation}
+#snapToggle{display:none}
+.stage #fontCycle{display:block;width:100%;min-height:34px;font-size:19px;touch-action:manipulation}
 .stage #snapToggle{display:block}
 .stage [data-startover]{display:none}
 .reading{position:absolute;left:10px;bottom:8px;font:600 12px var(--body);color:var(--muted);background:rgba(237,238,240,.92);padding:4px 10px;border-radius:20px;pointer-events:none}
@@ -88,12 +88,14 @@ body.staging{overflow:hidden}
 #s-write.stage{position:fixed;inset:0;z-index:5;border-radius:0;background:#fff;flex-direction:row;align-items:center;justify-content:center;gap:12px;
   padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
   container-type:size;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-.stage .whead,.stage #penLbl,.stage #thickLbl{display:none}
+.stage .whead,.stage #penLbl{display:none}
+.stage .side .lbl{font-size:10.5px;letter-spacing:.06em;line-height:1.2;margin-bottom:3px;white-space:nowrap}
+#styleWrap{display:none}.stage #styleWrap{display:block}
 .stage .sheet{width:min(calc(100vw - 150px),calc((100vh - 16px) * 5 / 3));border-radius:0;box-shadow:none;outline:2px dashed var(--line);outline-offset:-1px}
 .stage .ghost-hint{font-size:clamp(18px,5cqh,40px)}
-.stage .side{width:112px;flex:none;gap:6px}
+.stage .side{width:116px;flex:none;gap:5px}
 .stage .pens{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;justify-items:center}
-.stage .pen{width:30px;height:30px}
+.stage .pen{width:28px;height:28px}
 .stage .tools{gap:6px}
 .stage .thicks{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .stage .thick{width:100%;height:32px;touch-action:manipulation}
@@ -111,10 +113,10 @@ body.staging{overflow:hidden}
   .stage .ghost-hint .h-land{display:none}
   .stage .ghost-hint .h-port{display:inline}
 }
-@supports (width:1cqw){.stage .sheet{width:min(calc(100cqw - 124px),calc(100cqh * 5 / 3))}}
+@supports (width:1cqw){.stage .sheet{width:min(calc(100cqw - 128px),calc(100cqh * 5 / 3))}}
 
 .printwrap{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--paper);border-radius:14px;padding:16px}
-.print{width:2in;height:1.2in;background:#fff;border:1px dashed #9AA3B2;position:relative}
+.print{width:100%;max-width:420px;aspect-ratio:5/3;background:#fff;border:1px dashed #9AA3B2;position:relative}
 .print canvas{width:100%;height:100%;display:block}
 .sig{font:800 13px var(--body);text-align:center}
 .sig span{display:block;font-weight:600;color:var(--muted);font-size:12px}
@@ -141,11 +143,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     <div class="field"><label for="name">First name</label><input id="name" autocomplete="given-name" autocapitalize="words" maxlength="40" placeholder="Your first name"></div>
     <div class="field"><label for="org">Organization</label><input id="org" autocomplete="organization" autocapitalize="words" maxlength="100" placeholder="Where you work"></div>
     <p class="err" id="whoErr" role="alert" hidden></p>
-    <div class="lbl">How do you want to sign?</div>
-    <div class="choose">
-      <button class="btn" type="submit" value="draw" id="goDraw">Write it by hand</button>
-      <button class="btn dark" type="submit" value="type" id="goType">Type it</button>
-    </div>
+    <button class="btn wide" type="submit" id="goDraw">Next: write your note</button>
     <p class="muted">Takes about a minute. Your note will be printed in the Class of 2026 yearbook.</p>
   </form>
 
@@ -174,10 +172,10 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
         <div class="lbl" id="penLbl">Pen color</div>
         <div class="pens" role="group" aria-label="Pen color" id="pens"></div>
       </div>
-      <button type="button" class="font" id="fontCycle" aria-label="Change handwriting style" title="Change handwriting style"></button>
+      <div id="styleWrap"><div class="lbl" id="styleLbl">Style: tap to change</div><button type="button" class="font" id="fontCycle" aria-label="Change handwriting style"></button></div>
       <div id="thickWrap">
-        <div class="lbl" id="thickLbl">Ink thickness</div>
-        <div class="thicks" role="group" aria-label="Ink thickness" id="thicks"></div>
+        <div class="lbl" id="thickLbl">Pen size: Medium</div>
+        <div class="thicks" role="group" aria-label="Pen size" id="thicks"></div>
       </div>
       <div class="tools" id="tools">
         <button type="button" class="btn ghost" id="undo" disabled>Undo</button>
@@ -193,9 +191,8 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   <section class="card" id="s-preview" hidden>
     <h2>Here’s how it will print</h2>
     <div class="printwrap">
-      <div class="print"><canvas id="printCv" width="600" height="360" aria-label="Your note at about printed size"></canvas></div>
-      <div class="muted" style="font-size:12.5px">About the printed size: 2 inches wide</div>
-      <div class="sig" id="sig"></div>
+      <div class="print"><canvas id="printCv" width="600" height="360" aria-label="Your note as it will print"></canvas></div>
+            <div class="sig" id="sig"></div>
     </div>
     <p class="consent">By tapping Send, you agree that your note and name will be printed in the Class of 2026 yearbook.</p>
     <p class="err" id="sendErr" role="alert" hidden></p>
@@ -216,20 +213,22 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
 <script>
 (() => {
   const API = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/yearbook';
-  const W = 1800, H = 1080;      // saved PNG; 2 x 1.2 in at 300 DPI only needs 600 x 360
-  // handwriting line width in saved pixels (900 px = 1 printed inch): fine is about a 1 pt line, bold about 2.4 pt
-  const WIDTHS = [['fine', 12, 'Fine', 6], ['medium', 20, 'Medium', 10], ['bold', 30, 'Bold', 15]];
+  const W = 1800, H = 1080;      // saved PNG: prints sharp up to 6 x 3.6 in at 300 DPI
+  // handwriting line width in saved pixels, out of 1800 across
+  // last number: extra weight added around snapped or typed letters (at a 200 px letter size)
+  const WIDTHS = [['fine', 12, 'Fine', 6, 0], ['medium', 20, 'Medium', 10, 4], ['bold', 30, 'Bold', 15, 10]];
   const EDGE = 15;
   const COLORS = [
     ['blue', '#1F5FE0', 'Blue'], ['magenta', '#E8279A', 'Magenta'], ['teal', '#0FA58A', 'Teal'],
     ['purple', '#7B3FD6', 'Purple'], ['orange-red', '#F04A23', 'Orange-red'], ['navy', '#0E1A30', 'Navy'],
   ];
-  // [family, weight, label, size factor so the five styles look the same size]
+  // [family, weight, label, size factor so the styles look about the same size]
   const FONTS = [
     ['Caveat', 700, 'Casual', 1.12], ['Patrick Hand', 400, 'Neat', 1], ['Indie Flower', 400, 'Loopy', .96],
     ['Covered By Your Grace', 400, 'Marker', 1.1], ['Satisfy', 400, 'Cursive', .98],
+    ['Architects Daughter', 400, 'Tidy', .9], ['Shadows Into Light', 400, 'Tall', 1.05], ['Permanent Marker', 400, 'Poster', .84],
   ];
-  const MAX_SIZE = 300, MIN_SIZE = 90;   // typed text never prints smaller than about 7 pt
+  const MAX_SIZE = 300, MIN_SIZE = 90;   // letters never drop below 5% of the note's width
   const $ = (id) => document.getElementById(id);
   const screens = { who: $('s-who'), write: $('s-write'), preview: $('s-preview'), thanks: $('s-thanks') };
   const pad = $('pad'), sheet = $('sheet'), g = pad.getContext('2d');
@@ -253,11 +252,12 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     const typing = mode === 'type';
     screens.write.classList.toggle('typing', typing);
     $('typeUi').hidden = !typing; $('tools').hidden = typing;
-    $('thickWrap').hidden = typing || snap; $('fontCycle').hidden = typing || !snap; $('snapToggle').hidden = typing;
-    $('writeHead').textContent = typing ? 'Type your note' : 'Write your note and sign it';
+    $('styleWrap').hidden = typing || !snap; $('snapToggle').hidden = typing; $('swap').hidden = !typing && !snap;
+    $('thickLbl').textContent = 'Pen size: ' + pen[2];
+    $('writeHead').textContent = typing ? 'Fix any words we misread' : 'Write your note and sign it';
     $('writeHint').textContent = typing ? 'Keep it short. We’ll sign it with your first name.' : '';
-    $('swap').textContent = typing ? 'Back to writing by hand' : (snap ? 'Edit the text' : 'Type it instead');
-    $('snapToggle').textContent = snap ? 'Keep my own handwriting' : 'Snap to a font';
+    $('swap').textContent = typing ? 'Back to writing' : 'Edit the text';
+    $('snapToggle').textContent = snap ? 'Use my handwriting' : 'Snap to a style';
     document.querySelector('.h-land').textContent = snap ? 'Write a word, then lift your finger. It snaps into type.' : 'Write here';
     document.querySelector('.h-port').textContent = snap ? 'Turn your phone sideways. Write a word, then lift your finger.' : 'Turn your phone sideways and write here';
     $('fontCycle').textContent = font[2]; $('fontCycle').style.fontFamily = `"${font[0]}", cursive`; $('fontCycle').style.fontWeight = font[1];
@@ -296,11 +296,13 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     const size = 104, x0 = 70, maxW = W - 140; ctx.font = `${font[1]} ${size * font[3]}px "${font[0]}", cursive`;
     ctx.fillStyle = hex; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     let line = '', y = 60 + size * .8;
+    ctx.strokeStyle = hex; ctx.lineJoin = 'round'; ctx.lineWidth = pen[4] * size / 200;
+    const ink = (t) => { if (pen[4]) ctx.strokeText(t, x0, y); ctx.fillText(t, x0, y); };
     for (const word of text.split(' ')) {
       const t = line ? line + ' ' + word : word;
-      if (ctx.measureText(t).width <= maxW || !line) line = t; else { ctx.fillText(line, x0, y); y += size * 1.2; line = word; }
+      if (ctx.measureText(t).width <= maxW || !line) line = t; else { ink(line); y += size * 1.2; line = word; }
     }
-    ctx.fillText(line, x0, y); ctx.restore();
+    ink(line); ctx.restore();
   }
   // Typed note: biggest size that fits the box, wrapped, signed with the first name.
   // Returns null when there is no text, false when it can't fit at a readable size.
@@ -334,8 +336,10 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     if (L) {
       ctx.fillStyle = hex; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left'; L.setFont(L.size);
       let y = L.top + L.size * .82;
-      for (const line of L.lines) { ctx.fillText(line, L.x0, y); y += L.size * L.LH; }
-      L.setFont(L.signSize); ctx.textAlign = 'right'; ctx.fillText(L.sign, L.x1, y - L.size * .82 + L.signSize * .86);
+      const ink = (t, x, yy, size) => { if (pen[4]) { ctx.lineWidth = pen[4] * size / 200; ctx.strokeText(t, x, yy); } ctx.fillText(t, x, yy); };
+      ctx.strokeStyle = hex; ctx.lineJoin = 'round';
+      for (const line of L.lines) { ink(line, L.x0, y, L.size); y += L.size * L.LH; }
+      L.setFont(L.signSize); ctx.textAlign = 'right'; ink(L.sign, L.x1, y - L.size * .82 + L.signSize * .86, L.signSize);
     }
     ctx.restore(); return L;
   }
@@ -437,9 +441,9 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   });
   WIDTHS.forEach((w) => {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'thick'; b.style.setProperty('--d', w[3] + 'px'); b.setAttribute('aria-label', w[2] + ' ink'); b.setAttribute('aria-pressed', w === pen); b.title = w[2];
+    b.type = 'button'; b.className = 'thick'; b.style.setProperty('--d', w[3] + 'px'); b.setAttribute('aria-label', w[2] + ' pen'); b.setAttribute('aria-pressed', w === pen); b.title = w[2];
     b.append(document.createElement('i'));
-    b.addEventListener('click', () => { pen = w; document.querySelectorAll('.thick').forEach((x) => x.setAttribute('aria-pressed', x === b)); redraw(); });
+    b.addEventListener('click', () => { pen = w; document.querySelectorAll('.thick').forEach((x) => x.setAttribute('aria-pressed', x === b)); refreshUi(); redraw(); });
     $('thicks').append(b);
   });
   FONTS.forEach((f, i) => {
@@ -470,8 +474,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     if (!n) { setErr($('whoErr'), 'Add your first name.'); nameIn.focus(); return; }
     if (!o) { setErr($('whoErr'), 'Add your organization.'); orgIn.focus(); return; }
     nameIn.value = n; orgIn.value = o; setErr($('whoErr'));
-    screen = 'write'; setMode(e.submitter && e.submitter.value === 'type' ? 'type' : 'draw'); show('write');
-    if (mode === 'type') noteIn.focus();
+    screen = 'write'; setMode('draw'); show('write');
   });
   $('backWrite').addEventListener('click', () => show('write'));
   $('toPreview').addEventListener('click', async () => {
@@ -501,7 +504,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     if (sending) return;
     sending = true; const btn = $('send'); btn.disabled = true; btn.textContent = 'Sending…'; setErr($('sendErr'));
     try {
-      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], style: mode === 'type' ? 'Typed: ' + font[0] : snap ? 'Handwritten, snapped to ' + font[0] : 'Handwritten, ' + pen[0] + ' ink', png: exportPng(), consent: true }) });
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], style: usesText() && mode === 'type' ? 'Snapped: ' + font[0] + ', ' + pen[0] : snap ? 'Snapped: ' + font[0] + ', ' + pen[0] : 'Handwritten, ' + pen[0] + ' pen', png: exportPng(), consent: true }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.message || 'Your note didn’t send. Check your connection and tap Send again.');
       $('thanksName').textContent = nameIn.value.split(' ')[0];
