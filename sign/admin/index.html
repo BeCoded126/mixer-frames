@@ -55,7 +55,7 @@ code{font-size:12.5px;word-break:break-all}
           <button class="btn ghost" id="refresh" type="button">Refresh</button>
         </div>
       </div>
-      <p class="muted" id="status">Each PNG is 1800 x 1080 with a transparent background, handwriting only. The lined paper below is just for previewing.</p>
+      <p class="muted" id="status">Each PNG is 1800 x 1080 with a transparent background, the note only. The lined paper below is just for previewing.</p>
     </div>
     <div class="grid" id="grid"></div>
   </div>
@@ -77,7 +77,7 @@ code{font-size:12.5px;word-break:break-all}
   }
   const when = (t) => new Date(t).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' ET';
   function save(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
-  const csvText = () => [['Name', 'Organization', 'Pen color', 'Pen hex', 'Submitted (ET)', 'File'], ...notes.map((n) => [n.full_name, n.organization, n.pen_color, n.pen_hex, when(n.submitted_at), n.file_name])]
+  const csvText = () => [['Name', 'Organization', 'Pen color', 'Pen hex', 'Style', 'Submitted (ET)', 'File'], ...notes.map((n) => [n.full_name, n.organization, n.pen_color, n.pen_hex, n.note_style || 'Handwritten', when(n.submitted_at), n.file_name])]
     .map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
 
   function render() {
@@ -93,8 +93,9 @@ code{font-size:12.5px;word-break:break-all}
       const b = document.createElement('b'); b.textContent = n.full_name; who.append(b, document.createTextNode(n.organization));
       const meta = document.createElement('div'); meta.className = 'meta';
       const col = document.createElement('span'); const sw = document.createElement('i'); sw.className = 'sw'; sw.style.background = n.pen_hex; col.append(sw, document.createTextNode(n.pen_color + ' ' + n.pen_hex));
+      const st = document.createElement('span'); st.textContent = n.note_style || 'Handwritten';
       const t = document.createElement('span'); t.textContent = when(n.submitted_at);
-      const f = document.createElement('code'); f.textContent = n.file_name; meta.append(col, t, f);
+      const f = document.createElement('code'); f.textContent = n.file_name; meta.append(col, st, t, f);
       const row = document.createElement('div'); row.className = 'row';
       const dl = document.createElement('button'); dl.className = 'btn ghost'; dl.type = 'button'; dl.textContent = 'Download PNG';
       dl.addEventListener('click', async () => { const r = await fetch(n.url); save(await r.blob(), n.file_name); });

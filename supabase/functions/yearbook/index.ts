@@ -1,5 +1,5 @@
 // yearbook: "Sign My Yearbook" notes for the Class of 2026 yearbook.
-// POST JSON { action: "submit", name, organization, color, hex, png (data URL), consent }
+// POST JSON { action: "submit", name (first name), organization, color, hex, style, png (data URL), consent }
 //   -> saves a transparent 1800x1080 PNG to the private "yearbook-notes" bucket and a row in yearbook_notes.
 // POST JSON { action: "list", pass }            -> all notes with short-lived signed image links (admin).
 // POST JSON { action: "remove", pass, id }      -> deletes one note (admin).
@@ -44,7 +44,8 @@ async function isAdmin(pass: unknown) {
 
 async function submit(body: Record<string, unknown>) {
   const name = clean(body.name, 80), org = clean(body.organization, 100), color = clean(body.color, 20), hex = clean(body.hex, 9);
-  if (name.length < 2 || !org) return reply(400, { error: "missing", message: "Add your full name and organization." });
+  if (!name || !org) return reply(400, { error: "missing", message: "Add your first name and organization." });
+  const style = clean(body.style, 40) || "Handwritten";
   if (!COLORS.has(color) || !/^#[0-9a-fA-F]{6}$/.test(hex)) return reply(400, { error: "color", message: "Pick a pen color." });
   if (body.consent !== true) return reply(400, { error: "consent", message: "Consent is required." });
   const m = typeof body.png === "string" ? body.png.match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/) : null;
@@ -71,7 +72,7 @@ async function submit(body: Record<string, unknown>) {
   if (!up.ok) { console.error("upload failed", up.status, await up.text()); return reply(500, { error: "save", message: "We couldn't save your note. Try sending again." }); }
   const ins = await rest("yearbook_notes", {
     method: "POST", headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ full_name: name, organization: org, pen_color: color, pen_hex: hex.toUpperCase(), file_name: file, consent: true, device: clean(body.device, 10) || null }),
+    body: JSON.stringify({ full_name: name, organization: org, pen_color: color, pen_hex: hex.toUpperCase(), file_name: file, note_style: style, consent: true, device: clean(body.device, 10) || null }),
   });
   if (!ins.ok) {
     console.error("insert failed", ins.status, await ins.text());
@@ -83,7 +84,7 @@ async function submit(body: Record<string, unknown>) {
 }
 
 async function list() {
-  const res = await rest("yearbook_notes?select=id,submitted_at,full_name,organization,pen_color,pen_hex,file_name,device&order=submitted_at.asc");
+  const res = await rest("yearbook_notes?select=id,submitted_at,full_name,organization,pen_color,pen_hex,note_style,file_name,device&order=submitted_at.asc");
   if (!res.ok) return reply(500, { error: "list" });
   const rows = await res.json();
   let signed: { path: string; signedURL?: string }[] = [];
