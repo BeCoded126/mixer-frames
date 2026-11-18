@@ -46,7 +46,7 @@ h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(
 .btn.wide{width:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .link{appearance:none;background:none;border:0;padding:10px 4px;font:600 14px var(--body);color:var(--muted);text-decoration:underline;cursor:pointer;min-height:44px}
-.btn:focus-visible,.link:focus-visible,input:focus-visible,textarea:focus-visible,.pen:focus-visible,.font:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
+.btn:focus-visible,.link:focus-visible,input:focus-visible,textarea:focus-visible,.pen:focus-visible,.thick:focus-visible,.font:focus-visible{outline:3px solid var(--mag);outline-offset:2px}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .row.split{justify-content:space-between}
 .err{color:#B3261E;font-size:14px;font-weight:600}
@@ -64,6 +64,10 @@ h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(
 .pen{appearance:none;width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--line);background:var(--c);cursor:pointer;padding:0}
 .pen[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink);transform:scale(1.08)}
 .tools{display:flex;gap:8px}
+.thicks{display:flex;gap:8px;margin-top:8px}
+.thick{appearance:none;width:44px;height:44px;border-radius:10px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
+.thick i{display:block;width:var(--d);height:var(--d);border-radius:50%;background:var(--ink)}
+.thick[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -4px 0 var(--mint)}
 .fonts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:2px}
 @media (max-width:520px){.fonts{grid-template-columns:repeat(3,1fr)}}
 .font{appearance:none;border:2px solid var(--line);background:#fff;border-radius:10px;min-height:48px;padding:4px 6px;font-size:22px;line-height:1.1;color:var(--ink);cursor:pointer}
@@ -79,15 +83,17 @@ body.staging{overflow:hidden}
 #s-write.stage{position:fixed;inset:0;z-index:5;border-radius:0;background:#fff;flex-direction:row;align-items:center;justify-content:center;gap:12px;
   padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
   container-type:size;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-.stage .whead,.stage #penLbl{display:none}
+.stage .whead,.stage #penLbl,.stage #thickLbl{display:none}
 .stage .sheet{width:min(calc(100vw - 150px),calc((100vh - 16px) * 5 / 3));border-radius:0;box-shadow:none;outline:2px dashed var(--line);outline-offset:-1px}
 .stage .ghost-hint{font-size:clamp(18px,5cqh,40px)}
 .stage .side{width:112px;flex:none;gap:6px}
 .stage .pens{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;justify-items:center}
 .stage .pen{width:30px;height:30px}
-.stage .tools{flex-direction:column;gap:6px}
+.stage .tools{gap:6px}
+.stage .thicks{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stage .thick{width:100%;height:32px;touch-action:manipulation}
 .stage .btn{touch-action:manipulation}
-.stage .btn.ghost{min-height:34px;width:100%;padding:4px 8px}
+.stage .btn.ghost{min-height:34px;flex:1;min-width:0;padding:4px 2px;font-size:11px;letter-spacing:.06em}
 .stage #toPreview{min-height:42px;padding:8px 6px;font-size:14px;letter-spacing:.1em}
 .stage .side .err{font-size:12px;line-height:1.3}
 .stage .links{flex-direction:column;align-items:stretch;gap:0}
@@ -162,6 +168,10 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
         <div class="lbl" id="penLbl">Pen color</div>
         <div class="pens" role="group" aria-label="Pen color" id="pens"></div>
       </div>
+      <div id="thickWrap">
+        <div class="lbl" id="thickLbl">Ink thickness</div>
+        <div class="thicks" role="group" aria-label="Ink thickness" id="thicks"></div>
+      </div>
       <div class="tools" id="tools">
         <button type="button" class="btn ghost" id="undo" disabled>Undo</button>
         <button type="button" class="btn ghost" id="clear" disabled>Clear</button>
@@ -200,7 +210,9 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
 (() => {
   const API = 'https://mlcivpmqivfcqtukdbji.supabase.co/functions/v1/yearbook';
   const W = 1800, H = 1080;      // saved PNG; 2 x 1.2 in at 300 DPI only needs 600 x 360
-  const PEN = 20;                // handwriting line width in saved pixels: about 0.022 in (0.56 mm) in print
+  // handwriting line width in saved pixels (900 px = 1 printed inch): fine is about a 1 pt line, bold about 2.4 pt
+  const WIDTHS = [['fine', 12, 'Fine', 6], ['medium', 20, 'Medium', 10], ['bold', 30, 'Bold', 15]];
+  const EDGE = 15;
   const COLORS = [
     ['blue', '#1F5FE0', 'Blue'], ['magenta', '#E8279A', 'Magenta'], ['teal', '#0FA58A', 'Teal'],
     ['purple', '#7B3FD6', 'Purple'], ['orange-red', '#F04A23', 'Orange-red'], ['navy', '#0E1A30', 'Navy'],
@@ -215,7 +227,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   const screens = { who: $('s-who'), write: $('s-write'), preview: $('s-preview'), thanks: $('s-thanks') };
   const pad = $('pad'), sheet = $('sheet'), g = pad.getContext('2d');
   const nameIn = $('name'), orgIn = $('org'), noteIn = $('noteText');
-  let strokes = [], cur = null, color = COLORS[0], font = FONTS[0], mode = 'draw', screen = 'who', sending = false, rotated = false;
+  let strokes = [], cur = null, color = COLORS[0], pen = WIDTHS[1], font = FONTS[0], mode = 'draw', screen = 'who', sending = false, rotated = false;
 
   const tidy = (s) => s.replace(/\s+/g, ' ').trim();
   function setErr(el, msg) { el.textContent = msg || ''; el.hidden = !msg; }
@@ -229,7 +241,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   function setMode(m) {
     mode = m; const typing = m === 'type';
     screens.write.classList.toggle('typing', typing);
-    $('typeUi').hidden = !typing; $('tools').hidden = typing;
+    $('typeUi').hidden = !typing; $('tools').hidden = $('thickWrap').hidden = typing;
     $('writeHead').textContent = typing ? 'Type your note' : 'Write your note and sign it';
     $('writeHint').textContent = typing ? 'Keep it short. We’ll sign it with your first name.' : 'Use your finger, a stylus or your mouse. Keep it short and write big: this prints 2 inches wide in the book.';
     $('swap').textContent = typing ? 'Write it by hand instead' : 'Type it instead';
@@ -246,10 +258,10 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
 
   // ---- the note. Handwriting is stored in saved-PNG coordinates so the export is exact.
   function paintStrokes(ctx, k, hex) {
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = hex; ctx.fillStyle = hex; ctx.lineWidth = PEN * k;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = hex; ctx.fillStyle = hex; ctx.lineWidth = pen[1] * k;
     for (const s of strokes) {
       const p = s.pts;
-      if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0] * k, p[0][1] * k, PEN * k / 2, 0, Math.PI * 2); ctx.fill(); continue; }
+      if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0] * k, p[0][1] * k, pen[1] * k / 2, 0, Math.PI * 2); ctx.fill(); continue; }
       ctx.beginPath(); ctx.moveTo(p[0][0] * k, p[0][1] * k);
       for (let i = 1; i < p.length - 1; i++) {
         const mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2;
@@ -315,7 +327,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     // when the page is drawn sideways, its x axis runs down the screen and its y axis runs right to left
     const x = rotated ? (e.clientY - r.top) / r.height * W : (e.clientX - r.left) / r.width * W;
     const y = rotated ? (r.right - e.clientX) / r.width * H : (e.clientY - r.top) / r.height * H;
-    return [Math.round(Math.max(PEN / 2, Math.min(W - PEN / 2, x)) * 10) / 10, Math.round(Math.max(PEN / 2, Math.min(H - PEN / 2, y)) * 10) / 10];
+    return [Math.round(Math.max(EDGE, Math.min(W - EDGE, x)) * 10) / 10, Math.round(Math.max(EDGE, Math.min(H - EDGE, y)) * 10) / 10];
   }
   pad.addEventListener('pointerdown', (e) => {
     if (mode !== 'draw' || e.button > 0) return;
@@ -345,6 +357,13 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     b.type = 'button'; b.className = 'pen'; b.style.setProperty('--c', c[1]); b.setAttribute('aria-label', c[2] + ' pen'); b.setAttribute('aria-pressed', i === 0); b.title = c[2];
     b.addEventListener('click', () => { color = c; document.querySelectorAll('.pen').forEach((x) => x.setAttribute('aria-pressed', x === b)); redraw(); });
     $('pens').append(b);
+  });
+  WIDTHS.forEach((w) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'thick'; b.style.setProperty('--d', w[3] + 'px'); b.setAttribute('aria-label', w[2] + ' ink'); b.setAttribute('aria-pressed', w === pen); b.title = w[2];
+    b.append(document.createElement('i'));
+    b.addEventListener('click', () => { pen = w; document.querySelectorAll('.thick').forEach((x) => x.setAttribute('aria-pressed', x === b)); redraw(); });
+    $('thicks').append(b);
   });
   FONTS.forEach((f, i) => {
     const b = document.createElement('button');
@@ -391,7 +410,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     if (sending) return;
     sending = true; const btn = $('send'); btn.disabled = true; btn.textContent = 'Sending…'; setErr($('sendErr'));
     try {
-      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], style: mode === 'type' ? 'Typed: ' + font[0] : 'Handwritten', png: exportPng(), consent: true }) });
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], style: mode === 'type' ? 'Typed: ' + font[0] : 'Handwritten, ' + pen[0] + ' ink', png: exportPng(), consent: true }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.message || 'Your note didn’t send. Check your connection and tap Send again.');
       $('thanksName').textContent = nameIn.value.split(' ')[0];
