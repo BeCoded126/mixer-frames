@@ -73,6 +73,11 @@ h1.patch .u{display:block;height:5px;width:74%;margin:6px auto 0;background:var(
 .font{appearance:none;border:2px solid var(--line);background:#fff;border-radius:10px;min-height:48px;padding:4px 6px;font-size:22px;line-height:1.1;color:var(--ink);cursor:pointer}
 .font[aria-pressed="true"]{border-color:var(--mint-ink);box-shadow:inset 0 -4px 0 var(--mint)}
 .count{font-size:12.5px;color:var(--muted);text-align:right}
+#fontCycle,#snapToggle{display:none}
+.stage #fontCycle{display:block;width:100%;min-height:36px;font-size:20px;touch-action:manipulation}
+.stage #snapToggle{display:block}
+.stage [data-startover]{display:none}
+.reading{position:absolute;left:10px;bottom:8px;font:600 12px var(--body);color:var(--muted);background:rgba(237,238,240,.92);padding:4px 10px;border-radius:20px;pointer-events:none}
 
 .ghost-hint span{display:none}
 .typing .ghost-hint .h-type{display:inline}
@@ -162,12 +167,14 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     <div class="sheet" id="sheet">
       <div class="ghost-hint" id="ghost"><span class="h-land">Write here</span><span class="h-port">Turn your phone sideways and write here</span><span class="h-type">Your note shows up here</span></div>
       <canvas id="pad" aria-label="Your note"></canvas>
+      <div class="reading" id="reading" hidden aria-live="polite">Reading your handwriting…</div>
     </div>
     <div class="side">
       <div>
         <div class="lbl" id="penLbl">Pen color</div>
         <div class="pens" role="group" aria-label="Pen color" id="pens"></div>
       </div>
+      <button type="button" class="font" id="fontCycle" aria-label="Change handwriting style" title="Change handwriting style"></button>
       <div id="thickWrap">
         <div class="lbl" id="thickLbl">Ink thickness</div>
         <div class="thicks" role="group" aria-label="Ink thickness" id="thicks"></div>
@@ -178,7 +185,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
       </div>
       <p class="err" id="writeErr" role="alert" hidden></p>
       <button type="button" class="btn wide" id="toPreview">Preview</button>
-      <div class="row split links"><button type="button" class="link" id="swap">Type it instead</button><button type="button" class="link" data-startover>Start over</button></div>
+      <div class="row split links"><button type="button" class="link" id="swap">Type it instead</button><button type="button" class="link" id="snapToggle"></button><button type="button" class="link" data-startover>Start over</button></div>
     </div>
   </section>
 
@@ -227,7 +234,11 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   const screens = { who: $('s-who'), write: $('s-write'), preview: $('s-preview'), thanks: $('s-thanks') };
   const pad = $('pad'), sheet = $('sheet'), g = pad.getContext('2d');
   const nameIn = $('name'), orgIn = $('org'), noteIn = $('noteText');
-  let strokes = [], cur = null, color = COLORS[0], pen = WIDTHS[1], font = FONTS[0], mode = 'draw', screen = 'who', sending = false, rotated = false;
+  let strokes = [], cur = null, color = COLORS[0], pen = WIDTHS[1], font = FONTS[0], mode = 'draw', screen = 'who', sending = false, rotated = false,
+      snap = true, gid = 0, chain = Promise.resolve(), snapTimer = null, reading = 0;
+  const MAXLEN = 120;
+  const snapping = () => mode === 'draw' && snap;      // handwriting that turns into a font
+  const usesText = () => mode === 'type' || snap;      // the saved note is text in a handwriting font
 
   const tidy = (s) => s.replace(/\s+/g, ' ').trim();
   function setErr(el, msg) { el.textContent = msg || ''; el.hidden = !msg; }
@@ -238,15 +249,22 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     Object.entries(screens).forEach(([k, el]) => { el.hidden = k !== name; });
     layout(); window.scrollTo(0, 0);
   }
-  function setMode(m) {
-    mode = m; const typing = m === 'type';
+  function refreshUi() {
+    const typing = mode === 'type';
     screens.write.classList.toggle('typing', typing);
-    $('typeUi').hidden = !typing; $('tools').hidden = $('thickWrap').hidden = typing;
+    $('typeUi').hidden = !typing; $('tools').hidden = typing;
+    $('thickWrap').hidden = typing || snap; $('fontCycle').hidden = typing || !snap; $('snapToggle').hidden = typing;
     $('writeHead').textContent = typing ? 'Type your note' : 'Write your note and sign it';
-    $('writeHint').textContent = typing ? 'Keep it short. We’ll sign it with your first name.' : 'Use your finger, a stylus or your mouse. Keep it short and write big: this prints 2 inches wide in the book.';
-    $('swap').textContent = typing ? 'Write it by hand instead' : 'Type it instead';
-    setErr($('writeErr')); layout();
+    $('writeHint').textContent = typing ? 'Keep it short. We’ll sign it with your first name.' : '';
+    $('swap').textContent = typing ? 'Back to writing by hand' : (snap ? 'Edit the text' : 'Type it instead');
+    $('snapToggle').textContent = snap ? 'Keep my own handwriting' : 'Snap to a font';
+    document.querySelector('.h-land').textContent = snap ? 'Write a word, then lift your finger. It snaps into type.' : 'Write here';
+    document.querySelector('.h-port').textContent = snap ? 'Turn your phone sideways. Write a word, then lift your finger.' : 'Turn your phone sideways and write here';
+    $('fontCycle').textContent = font[2]; $('fontCycle').style.fontFamily = `"${font[0]}", cursive`; $('fontCycle').style.fontWeight = font[1];
+    document.querySelectorAll('#fonts .font').forEach((x, k) => x.setAttribute('aria-pressed', FONTS[k] === font));
+    $('count').textContent = noteIn.value.length + ' / ' + MAXLEN;
   }
+  function setMode(m) { mode = m; refreshUi(); setErr($('writeErr')); layout(); }
   // handwriting takes over the whole screen; all sizing is CSS, so a late or missing rotation event can't shrink the page
   function layout() {
     const drawing = screen === 'write' && mode === 'draw';
@@ -260,7 +278,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   function paintStrokes(ctx, k, hex) {
     ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = hex; ctx.fillStyle = hex; ctx.lineWidth = pen[1] * k;
     for (const s of strokes) {
-      const p = s.pts;
+      const p = s.pts; ctx.globalAlpha = s.g ? .3 : 1;
       if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0] * k, p[0][1] * k, pen[1] * k / 2, 0, Math.PI * 2); ctx.fill(); continue; }
       ctx.beginPath(); ctx.moveTo(p[0][0] * k, p[0][1] * k);
       for (let i = 1; i < p.length - 1; i++) {
@@ -269,6 +287,20 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
       }
       const l = p[p.length - 1]; ctx.lineTo(l[0] * k, l[1] * k); ctx.stroke();
     }
+    ctx.globalAlpha = 1;
+  }
+  // while writing with snap on: the words read so far, small, along the top of the page
+  function paintRunning(ctx, k, hex) {
+    const text = noteIn.value.trim(); if (!text) return;
+    ctx.save(); ctx.scale(k, k);
+    const size = 104, x0 = 70, maxW = W - 140; ctx.font = `${font[1]} ${size * font[3]}px "${font[0]}", cursive`;
+    ctx.fillStyle = hex; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    let line = '', y = 60 + size * .8;
+    for (const word of text.split(' ')) {
+      const t = line ? line + ' ' + word : word;
+      if (ctx.measureText(t).width <= maxW || !line) line = t; else { ctx.fillText(line, x0, y); y += size * 1.2; line = word; }
+    }
+    ctx.fillText(line, x0, y); ctx.restore();
   }
   // Typed note: biggest size that fits the box, wrapped, signed with the first name.
   // Returns null when there is no text, false when it can't fit at a readable size.
@@ -307,13 +339,15 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     }
     ctx.restore(); return L;
   }
-  function paintNote(ctx, k) { if (mode === 'type') return paintTyped(ctx, k, color[1]); paintStrokes(ctx, k, color[1]); return true; }
+  function paintNote(ctx, k) { if (usesText()) return paintTyped(ctx, k, color[1]); paintStrokes(ctx, k, color[1]); return true; }
   function redraw() {
     g.clearRect(0, 0, pad.width, pad.height);
-    const res = paintNote(g, pad.width / W);
-    if (mode === 'type') { $('ghost').hidden = !!noteIn.value.trim(); setErr($('writeErr'), res === false ? TOO_LONG : ''); }
-    else $('ghost').hidden = strokes.length > 0;
-    $('undo').disabled = $('clear').disabled = !strokes.length;
+    const k = pad.width / W, hasText = !!noteIn.value.trim();
+    if (snapping()) { paintRunning(g, k, color[1]); paintStrokes(g, k, color[1]); $('ghost').hidden = hasText || strokes.length > 0; }
+    else if (mode === 'type') { const res = paintTyped(g, k, color[1]); $('ghost').hidden = hasText; setErr($('writeErr'), res === false ? TOO_LONG : ''); }
+    else { paintStrokes(g, k, color[1]); $('ghost').hidden = strokes.length > 0; }
+    $('undo').disabled = $('clear').disabled = !(strokes.length || (snap && hasText));
+    $('reading').hidden = !(reading > 0 && snapping());
   }
   function fit() {
     const cw = sheet.clientWidth; if (!cw) return;   // layout width: not affected by the sideways transform
@@ -332,7 +366,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   pad.addEventListener('pointerdown', (e) => {
     if (mode !== 'draw' || e.button > 0) return;
     e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch (x) {}
-    rotated = isRotated(); cur = { id: e.pointerId, pts: [pt(e)] }; strokes.push(cur); setErr($('writeErr')); redraw();
+    clearTimeout(snapTimer); rotated = isRotated(); cur = { id: e.pointerId, pts: [pt(e)] }; strokes.push(cur); setErr($('writeErr')); redraw();
   });
   pad.addEventListener('pointermove', (e) => {
     if (!cur || e.pointerId !== cur.id) return;
@@ -344,7 +378,50 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     }
     redraw();
   });
-  const end = (e) => { if (cur && e.pointerId === cur.id) cur = null; };
+  const end = (e) => {
+    if (!cur || e.pointerId !== cur.id) return;
+    cur = null; if (snap) { clearTimeout(snapTimer); snapTimer = setTimeout(snapNow, 1000); }
+  };
+
+  // ---- snap: one second after the finger lifts, the new ink is read and becomes text in the chosen style
+  function snapNow() {
+    clearTimeout(snapTimer);
+    const group = strokes.filter((s) => !s.g); if (!group.length || !snapping()) return;
+    const id = ++gid; group.forEach((s) => { s.g = id; });
+    let x0 = W, y0 = H, x1 = 0, y1 = 0;
+    for (const s of group) for (const p of s.pts) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); }
+    const padPx = 50, bw = x1 - x0 + padPx * 2, bh = y1 - y0 + padPx * 2, k = Math.min(1, 1100 / bw, 420 / bh);
+    const c = document.createElement('canvas'); c.width = Math.max(40, Math.round(bw * k)); c.height = Math.max(40, Math.round(bh * k));
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+    x.translate((padPx - x0) * k, (padPx - y0) * k); x.lineCap = x.lineJoin = 'round'; x.strokeStyle = x.fillStyle = '#0E1A30'; x.lineWidth = 20 * k;
+    for (const s of group) {
+      const p = s.pts; x.beginPath();
+      if (p.length === 1) { x.arc(p[0][0] * k, p[0][1] * k, 10 * k, 0, Math.PI * 2); x.fill(); continue; }
+      x.moveTo(p[0][0] * k, p[0][1] * k); for (let i = 1; i < p.length; i++) x.lineTo(p[i][0] * k, p[i][1] * k); x.stroke();
+    }
+    const image = c.toDataURL('image/jpeg', .85);
+    reading++; redraw();
+    chain = chain.then(async () => {
+      let word = '', failed = false;
+      try {
+        const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'read', image, context: noteIn.value }) });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) word = (data.text || '').trim(); else failed = data.message || true;
+        // the note so far is sent to help with unclear letters; drop it if the reader echoes it back
+        const sofar = noteIn.value.trim().toLowerCase();
+        if (sofar && word.toLowerCase().startsWith(sofar)) word = word.slice(sofar.length).trim();
+      } catch (err) { failed = true; }
+      reading--;
+      if (!strokes.some((s) => s.g === id)) { redraw(); return; }          // cleared or undone while it was being read
+      strokes = strokes.filter((s) => s.g !== id);
+      if (word) {
+        const joined = noteIn.value && !/^[.,!?;:)]+$/.test(word) ? noteIn.value + ' ' + word : noteIn.value + word;
+        if (joined.length > MAXLEN) setErr($('writeErr'), 'That’s all the room there is.');
+        else { noteIn.value = joined; setErr($('writeErr')); }
+      } else setErr($('writeErr'), typeof failed === 'string' ? failed : 'Couldn’t read that one. Write it again a little bigger.');
+      refreshUi(); redraw();
+    });
+  }
   pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
   pad.addEventListener('touchstart', (e) => { if (mode === 'draw') e.preventDefault(); }, { passive: false });
   if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(sheet);
@@ -368,13 +445,22 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
   FONTS.forEach((f, i) => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'font'; b.textContent = f[2]; b.style.fontFamily = `"${f[0]}", cursive`; b.style.fontWeight = f[1]; b.setAttribute('aria-pressed', i === 0);
-    b.addEventListener('click', () => { font = f; document.querySelectorAll('.font').forEach((x) => x.setAttribute('aria-pressed', x === b)); redraw(); });
+    b.addEventListener('click', () => { font = f; refreshUi(); redraw(); });
     $('fonts').append(b);
     if (document.fonts) document.fonts.load(`${f[1]} 60px "${f[0]}"`).then(redraw).catch(() => {});
   });
-  noteIn.addEventListener('input', () => { $('count').textContent = noteIn.value.length + ' / 120'; redraw(); });
-  $('undo').addEventListener('click', () => { strokes.pop(); redraw(); });
-  $('clear').addEventListener('click', () => { strokes = []; redraw(); });
+  noteIn.addEventListener('input', () => { refreshUi(); redraw(); });
+  $('undo').addEventListener('click', () => {
+    clearTimeout(snapTimer);
+    const i = strokes.map((s) => !s.g).lastIndexOf(true);
+    if (i >= 0) strokes.splice(i, 1);                                                  // ink not read yet
+    else if (snap) noteIn.value = noteIn.value.trim().split(' ').slice(0, -1).join(' ');  // else the last word
+    if (snap && strokes.some((s) => !s.g)) snapTimer = setTimeout(snapNow, 1000);
+    setErr($('writeErr')); refreshUi(); redraw();
+  });
+  $('clear').addEventListener('click', () => { clearTimeout(snapTimer); strokes = []; if (snap) noteIn.value = ''; setErr($('writeErr')); refreshUi(); redraw(); });
+  $('fontCycle').addEventListener('click', () => { font = FONTS[(FONTS.indexOf(font) + 1) % FONTS.length]; refreshUi(); redraw(); });
+  $('snapToggle').addEventListener('click', () => { clearTimeout(snapTimer); snap = !snap; strokes = []; setErr($('writeErr')); refreshUi(); redraw(); });
   $('swap').addEventListener('click', () => setMode(mode === 'type' ? 'draw' : 'type'));
 
   // ---- steps
@@ -388,8 +474,12 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     if (mode === 'type') noteIn.focus();
   });
   $('backWrite').addEventListener('click', () => show('write'));
-  $('toPreview').addEventListener('click', () => {
-    if (mode === 'draw') {
+  $('toPreview').addEventListener('click', async () => {
+    if (snapping()) {
+      const btn = $('toPreview'); snapNow(); btn.disabled = true; await chain; btn.disabled = false;   // finish reading any ink first
+      if (noteIn.value.trim().length < 2) { setErr($('writeErr'), 'Write a word first. Lift your finger and it snaps into type.'); return; }
+      if (typedLayout(g) === false) { setErr($('writeErr'), TOO_LONG); return; }
+    } else if (mode === 'draw') {
       if (strokes.reduce((a, s) => a + s.pts.length, 0) < 12) { setErr($('writeErr'), 'Write your note and signature on the page first.'); return; }
     } else {
       if (noteIn.value.trim().length < 2) { setErr($('writeErr'), 'Type your note first.'); noteIn.focus(); return; }
@@ -406,15 +496,16 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     return c.toDataURL('image/png');
   }
   window.__yearbookExport = exportPng;
+  window.__yearbookIdle = () => reading === 0 && !strokes.length;
   $('send').addEventListener('click', async () => {
     if (sending) return;
     sending = true; const btn = $('send'); btn.disabled = true; btn.textContent = 'Sending…'; setErr($('sendErr'));
     try {
-      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], style: mode === 'type' ? 'Typed: ' + font[0] : 'Handwritten, ' + pen[0] + ' ink', png: exportPng(), consent: true }) });
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'submit', name: nameIn.value, organization: orgIn.value, color: color[0], hex: color[1], style: mode === 'type' ? 'Typed: ' + font[0] : snap ? 'Handwritten, snapped to ' + font[0] : 'Handwritten, ' + pen[0] + ' ink', png: exportPng(), consent: true }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.message || 'Your note didn’t send. Check your connection and tap Send again.');
       $('thanksName').textContent = nameIn.value.split(' ')[0];
-      strokes = []; noteIn.value = ''; show('thanks');
+      strokes = []; noteIn.value = ''; refreshUi(); show('thanks');
     } catch (err) {
       setErr($('sendErr'), /fetch|load/i.test(err.message) ? 'Your note didn’t send. Check your connection and tap Send again.' : err.message);
     }
@@ -425,7 +516,7 @@ footer{font-size:12.5px;color:var(--muted);text-align:center}
     b.addEventListener('click', () => {
       if (!armed) { b.textContent = 'Tap again to erase everything'; armed = setTimeout(() => { b.textContent = 'Start over'; armed = null; }, 4000); return; }
       clearTimeout(armed); armed = null; b.textContent = 'Start over';
-      strokes = []; nameIn.value = ''; orgIn.value = ''; noteIn.value = ''; $('count').textContent = '0 / 120'; redraw(); show('who');
+      clearTimeout(snapTimer); strokes = []; nameIn.value = ''; orgIn.value = ''; noteIn.value = ''; refreshUi(); redraw(); show('who');
     });
   });
 })();

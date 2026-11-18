@@ -1,6 +1,8 @@
 // yearbook: "Sign My Yearbook" notes for the Class of 2026 yearbook.
 // POST JSON { action: "submit", name (first name), organization, color, hex, style, png (data URL), consent }
 //   -> saves a transparent 1800x1080 PNG to the private "yearbook-notes" bucket and a row in yearbook_notes.
+// POST JSON { action: "read", image (JPEG data URL of a handwritten word or two), context } -> { text }: reads the handwriting
+//   with OpenAI so the page can redraw it in a handwriting font. The image is not stored.
 // POST JSON { action: "list", pass }            -> all notes with short-lived signed image links (admin).
 // POST JSON { action: "remove", pass, id }      -> deletes one note (admin).
 // Nothing in the bucket or table is readable without this function.
@@ -83,6 +85,36 @@ async function submit(body: Record<string, unknown>) {
   return reply(200, { ok: true, file_name: file, submitted_at: row.submitted_at });
 }
 
+// ---- handwriting -> text
+const READ_MODELS = [Deno.env.get("OPENAI_READ_MODEL") ?? "gpt-4o-mini", "gpt-4.1-mini", "gpt-4o"];
+const READ_DAY_CAP = 2500; // each word is one read
+async function read(body: Record<string, unknown>) {
+  const key = Deno.env.get("OPENAI_API_KEY");
+  const image = typeof body.image === "string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(body.image) ? body.image : "";
+  if (!key || !image || image.length > 600_000) return reply(400, { error: "image", message: "We couldn't read that. Try again, or type your note." });
+  const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+  const used = await rest(`yearbook_reads?select=id&created_at=gt.${encodeURIComponent(since)}&limit=1`, { headers: { Prefer: "count=exact" } });
+  if (Number((used.headers.get("content-range") ?? "/0").split("/")[1]) >= READ_DAY_CAP) return reply(429, { error: "busy", message: "That's busy right now. Type your note instead, or keep your handwriting." });
+  await rest("yearbook_reads", { method: "POST", headers: { Prefer: "return=minimal" }, body: "{}" });
+  const context = clean(body.context, 130).replace(/["\\]/g, "");
+  const prompt = "This image shows a word or a few words handwritten with a finger on a phone, part of a short yearbook note. Transcribe exactly what is written: same words, spelling, capital letters and punctuation, no corrections, nothing added. " +
+    (context ? `The note so far reads: "${context}". Use that only to help read unclear letters; do not repeat it. ` : "") +
+    "Reply with only the transcribed text on one line. If nothing is legible, reply with exactly: UNREADABLE";
+  for (const model of READ_MODELS) {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model, max_tokens: 40, temperature: 0, messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: image, detail: "high" } }] }] }),
+    });
+    if (!res.ok) { console.error("read failed", model, res.status, (await res.text()).slice(0, 300)); if (res.status === 404 || res.status === 400) continue; break; }
+    const data = await res.json();
+    let text = clean(data?.choices?.[0]?.message?.content, 200).replace(/^["“]|["”]$/g, "");
+    if (!text || /^UNREADABLE\.?$/i.test(text)) return reply(200, { ok: true, text: "" });
+    if (text.length > 60) text = text.slice(0, 60).replace(/\s+\S*$/, "");
+    return reply(200, { ok: true, text });
+  }
+  return reply(502, { error: "read", message: "We couldn't read that right now. Type your note instead, or keep your handwriting." });
+}
+
 async function list() {
   const res = await rest("yearbook_notes?select=id,submitted_at,full_name,organization,pen_color,pen_hex,note_style,file_name,device&order=submitted_at.asc");
   if (!res.ok) return reply(500, { error: "list" });
@@ -116,6 +148,7 @@ Deno.serve(async (req) => {
   try { body = JSON.parse(await req.text()); } catch { return reply(400, { error: "json" }); }
   try {
     if (body.action === "submit") return await submit(body);
+    if (body.action === "read") return await read(body);
     if (body.action === "list" || body.action === "remove") {
       if (!(await isAdmin(body.pass))) return reply(401, { error: "pass", message: "That passcode isn't right." });
       return body.action === "list" ? await list() : await remove(body.id);
